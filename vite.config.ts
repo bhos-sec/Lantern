@@ -13,8 +13,8 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         manifest: {
-          name: 'Nexus Stream',
-          short_name: 'Nexus',
+          name: 'Lantern',
+          short_name: 'Lantern',
           description: 'Private real-time media sharing and chat platform.',
           theme_color: '#09090b',
           background_color: '#09090b',

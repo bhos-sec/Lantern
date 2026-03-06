@@ -69,7 +69,7 @@ export function LobbyPage({ onJoinRoom }: LobbyPageProps) {
         {/* Header row */}
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-white">Nexus Lobby</h1>
+            <h1 className="text-3xl font-bold text-white">Lantern Lobby</h1>
             <p className="text-zinc-500 text-sm">
               You are online as{" "}
               <span className="text-emerald-500 font-bold">{userName}</span>
@@ -336,7 +336,7 @@ export function LobbyPage({ onJoinRoom }: LobbyPageProps) {
             </div>
           </div>
           <p className="text-[11px] text-zinc-600 italic">
-            Nexus Stream — serverless-style private media sharing
+            Lantern — serverless-style private media sharing
           </p>
         </div>
       </motion.div>

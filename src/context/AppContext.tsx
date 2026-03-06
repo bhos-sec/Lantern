@@ -71,7 +71,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setStep("lobby");
       setError(null);
       sound("join");
-      addNotification("Welcome to Nexus!", "success");
+      addNotification("Welcome to Lantern!", "success");
     });
 
     socket.on("error", (msg: string) => {

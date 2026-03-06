@@ -70,7 +70,7 @@ export function NameEntryPage() {
           <div className="inline-flex p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 mb-4">
             <Zap className="text-emerald-500" size={32} />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white">Nexus Stream</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-white">Lantern</h1>
           <p className="text-zinc-400">Private real-time media sharing</p>
         </div>
 
@@ -107,7 +107,7 @@ export function NameEntryPage() {
             disabled={!userName.trim() || hasSubmitted}
             className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98]"
           >
-            Enter Nexus
+            Enter Lantern
           </button>
 
           {/* Preview of who's online */}
