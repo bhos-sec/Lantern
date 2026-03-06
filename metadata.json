@@ -1,0 +1,9 @@
+{
+  "name": "Nexus Stream",
+  "description": "Private real-time media sharing and chat platform with room-based isolation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "display-capture"
+  ]
+}
