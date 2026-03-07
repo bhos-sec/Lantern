@@ -7,7 +7,7 @@ interface MediaPreferences {
   startVideoOff: boolean;
 }
 
-interface UseMediaReturn extends MediaPreferences {
+export interface UseMediaReturn extends MediaPreferences {
   audioDevices: MediaDeviceInfo[];
   videoDevices: MediaDeviceInfo[];
   localStream: MediaStream | null;

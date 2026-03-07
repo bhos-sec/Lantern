@@ -9,7 +9,7 @@ import React, {
 import { socket } from "../lib/socket";
 import { useNotifications } from "../hooks/useNotifications";
 import { playSound } from "../lib/sounds";
-import type { PresenceUser } from "../../shared/types";
+import type { PresenceUser } from "@shared/types";
 
 export type AppStep = "name" | "lobby" | "room";
 

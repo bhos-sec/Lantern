@@ -2,7 +2,7 @@ import { Socket, Server } from "socket.io";
 import type {
   SendMessagePayload,
   SendPrivateMessagePayload,
-} from "../../../../shared/types.js";
+} from "@shared/types";
 
 /** Handles room broadcast messages and private (DM) messages. */
 export function registerChatHandlers(socket: Socket, io: Server): void {
