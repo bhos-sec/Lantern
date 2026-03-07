@@ -91,6 +91,22 @@ export interface IncomingIceCandidatePayload {
   candidate: RTCIceCandidateInit;
 }
 
+// ─── Abuse Prevention (Server → Client) ──────────────────────────────────────
+
+/**
+ * Emitted when a socket exceeds a rate limit.
+ * The client should surface the `message` to the user and optionally
+ * disable the relevant UI control for `retryAfterMs` ms.
+ */
+export interface RateLimitedPayload {
+  /** Which action was throttled (e.g. 'chat', 'join-room'). */
+  action: string;
+  /** How long the client should wait before retrying (ms). */
+  retryAfterMs: number;
+  /** Human-readable explanation to show in the UI. */
+  message: string;
+}
+
 // ─── Device Session Events (Server → Client) ──────────────────────────────────
 
 /**
