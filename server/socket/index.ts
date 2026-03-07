@@ -4,6 +4,7 @@ import { registerRoomHandlers } from './handlers/roomHandler';
 import { registerChatHandlers } from './handlers/chatHandler';
 import { registerWebRTCHandlers } from './handlers/webrtcHandler';
 import { deviceSessionRepository } from '../repositories/deviceSessionRepository.js';
+import { clearLimiter } from '../lib/rateLimiter.js';
 import { IS_PROD } from '../config.js';
 
 /** Attach all domain-scoped event handlers to every new socket connection. */
@@ -64,6 +65,8 @@ export function initSocketHandlers(io: Server): void {
       if (deviceId) {
         deviceSessionRepository.unregisterBySocket(socket.id);
       }
+      // Release any rate-limiter state held for this socket
+      clearLimiter(socket.id);
     });
   });
 }
