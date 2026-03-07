@@ -7,10 +7,12 @@ import './index.css';
 interface ErrorBoundaryState { hasError: boolean; message: string }
 
 class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false, message: '' };
-  }
+  // React 19 ships Component as an interface (not a concrete class) in its
+  // bundled TypeScript types, so `state` and `props` are not automatically
+  // inherited as instance members.  Declaring them explicitly here satisfies
+  // TypeScript 5.8 without emitting any extra runtime code.
+  declare props: Readonly<{ children: ReactNode }>;
+  state: ErrorBoundaryState = { hasError: false, message: '' };
 
   static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
     return {
