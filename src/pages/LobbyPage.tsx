@@ -11,11 +11,12 @@ import {
 } from "lucide-react";
 import { socket } from "../lib/socket";
 import { useAppContext } from "../context/AppContext";
-import { useMedia } from "../hooks/useMedia";
+import type { UseMediaReturn } from "../hooks/useMedia";
 import { MediaSettingsModal } from "../components/ui/MediaSettingsModal";
 import { cn } from "../lib/utils";
 
 interface LobbyPageProps {
+  media: UseMediaReturn;
   /** Called when the user successfully acquires media + emits join-room. */
   onJoinRoom: (
     idToJoin: string,
@@ -29,7 +30,7 @@ interface LobbyPageProps {
  * Step 2 — Lobby.
  * Users can create or join a room, see active public rooms, and browse online users.
  */
-export function LobbyPage({ onJoinRoom }: LobbyPageProps) {
+export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
   const {
     userName,
     onlineUsers,
@@ -39,8 +40,6 @@ export function LobbyPage({ onJoinRoom }: LobbyPageProps) {
     setStep,
     error,
   } = useAppContext();
-
-  const media = useMedia();
 
   const [roomId, setRoomId] = useState("");
   const [roomPassword, setRoomPassword] = useState("");
@@ -60,7 +59,7 @@ export function LobbyPage({ onJoinRoom }: LobbyPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-6">
+    <div className="min-h-dvh flex items-center justify-center bg-zinc-950 p-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

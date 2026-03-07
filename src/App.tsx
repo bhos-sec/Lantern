@@ -112,9 +112,9 @@ export default function App() {
     <>
       <NotificationToast notifications={notifications} />
 
-      {step === 'name' && <NameEntryPage />}
+      {step === 'name' && <NameEntryPage media={media} />}
 
-      {step === 'lobby' && <LobbyPage onJoinRoom={joinRoom} />}
+      {step === 'lobby' && <LobbyPage media={media} onJoinRoom={joinRoom} />}
 
       {step === 'room' && (
         <RoomPage
@@ -126,6 +126,17 @@ export default function App() {
           onLeaveRoom={leaveRoom}
           onTogglePrivacy={toggleRoomPrivacy}
         />
+      )}
+
+      {step !== 'name' && step !== 'lobby' && step !== 'room' && (
+        <div className="min-h-dvh flex items-center justify-center bg-zinc-950">
+          <button
+            onClick={() => setStep('name')}
+            className="text-zinc-400 hover:text-white transition-colors"
+          >
+            Return to start
+          </button>
+        </div>
       )}
     </>
   );

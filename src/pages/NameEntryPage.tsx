@@ -4,7 +4,7 @@ import { Zap, Settings, Volume2, VolumeX } from "lucide-react";
 import { socket } from "../lib/socket";
 import { useAppContext } from "../context/AppContext";
 import { MediaSettingsModal } from "../components/ui/MediaSettingsModal";
-import { useMedia } from "../hooks/useMedia";
+import type { UseMediaReturn } from "../hooks/useMedia";
 import { cn } from "../lib/utils";
 
 /**
@@ -12,7 +12,7 @@ import { cn } from "../lib/utils";
  * The user sets their display name; on success the server emits "name-set-success"
  * and AppContext transitions to the lobby.
  */
-export function NameEntryPage() {
+export function NameEntryPage({ media }: { media: UseMediaReturn }) {
   const {
     userName,
     setUserName,
@@ -33,8 +33,6 @@ export function NameEntryPage() {
     }
   }, [error]);
 
-  const media = useMedia();
-
   const enterLobby = () => {
     if (!userName.trim()) return;
     sound("click");
@@ -43,7 +41,7 @@ export function NameEntryPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-6 relative">
+    <div className="min-h-dvh flex items-center justify-center bg-zinc-950 p-6 relative">
       {/* Top-right controls */}
       <div className="absolute top-6 right-6 flex items-center gap-2">
         <button
