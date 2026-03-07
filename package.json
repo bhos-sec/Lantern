@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-    "prod-sim": "cross-env NODE_ENV=production SIMULATE_PROD=true tsx server/index.ts",
     "build": "vite build",
+    "start": "cross-env NODE_ENV=production node --import tsx/esm server/index.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
