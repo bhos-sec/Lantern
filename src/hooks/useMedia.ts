@@ -40,6 +40,7 @@ export function useMedia(): UseMediaReturn {
 
   // Enumerate available devices once on mount
   useEffect(() => {
+    if (!navigator.mediaDevices?.enumerateDevices) return;
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       setAudioDevices(devices.filter((d) => d.kind === "audioinput"));
       setVideoDevices(devices.filter((d) => d.kind === "videoinput"));
@@ -51,6 +52,11 @@ export function useMedia(): UseMediaReturn {
    * Returns the stream or null on full failure.
    */
   const acquireMedia = async (): Promise<MediaStream | null> => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      console.error("Media devices are not available. Use HTTPS or localhost.");
+      return null;
+    }
+
     const constraints = {
       video: selectedVideoDevice ? { deviceId: { exact: selectedVideoDevice } } : true,
       audio: selectedAudioDevice ? { deviceId: { exact: selectedAudioDevice } } : true,
@@ -69,7 +75,7 @@ export function useMedia(): UseMediaReturn {
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           setIsMuted(true);
         } catch {
-          alert("Permission denied or no media devices found. Please grant camera/microphone access.");
+          console.error("Permission denied or no media devices found.");
           return null;
         }
       }
@@ -105,6 +111,7 @@ export function useMedia(): UseMediaReturn {
   const toggleScreenShare = async (peers: Record<string, RTCPeerConnection>) => {
     if (!isScreenSharing) {
       try {
+        if (!navigator.mediaDevices?.getDisplayMedia) return;
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
         const screenTrack = screenStream.getVideoTracks()[0];
 
@@ -130,6 +137,7 @@ export function useMedia(): UseMediaReturn {
 
   const stopScreenShare = async (peers: Record<string, RTCPeerConnection>) => {
     try {
+      if (!navigator.mediaDevices?.getUserMedia) return;
       const camStream = await navigator.mediaDevices.getUserMedia({ video: true });
       const camTrack = camStream.getVideoTracks()[0];
 
