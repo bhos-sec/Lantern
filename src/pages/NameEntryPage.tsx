@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Zap, Settings, Volume2, VolumeX } from "lucide-react";
 import { socket } from "../lib/socket";
@@ -26,6 +26,17 @@ export function NameEntryPage() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  // Re-enable the button whenever the server responds with an error
+  useEffect(() => {
+    if (error) {
+      setHasSubmitted(false);
+    }
+  }, [error]);
+
+  // Also re-enable the button whenever the user edits their name
+  useEffect(() => {
+    setHasSubmitted(false);
+  }, [userName]);
   const media = useMedia();
 
   const enterLobby = () => {

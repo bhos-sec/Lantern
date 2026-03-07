@@ -43,6 +43,10 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
     if (userRepository.exists(socket.id)) {
       userRepository.update(socket.id, { roomId });
     } else {
+      if (userRepository.isNameTaken(userName)) {
+        socket.emit("error", "This name is already taken. Please choose another.");
+        return;
+      }
       userRepository.add(socket.id, { name: userName, roomId, showRoom: true });
     }
 
