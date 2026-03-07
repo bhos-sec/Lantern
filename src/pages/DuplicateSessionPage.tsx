@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { MonitorX, ArrowRightCircle, Zap } from 'lucide-react';
+import { MonitorX, ArrowRightCircle, Zap, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
 
 interface Props {
   /** Callback to claim this tab as the active session ("Use This Tab"). */
@@ -18,6 +19,7 @@ interface Props {
  */
 export function DuplicateSessionPage({ onTakeOver }: Props) {
   const [taking, setTaking] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
 
   const handleTakeOver = () => {
     setTaking(true);
@@ -25,7 +27,17 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
   };
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-zinc-950 p-6">
+    <div className="min-h-dvh flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6">
+      {/* Theme toggle */}
+      <div className="absolute top-6 right-6">
+        <button
+          onClick={toggleTheme}
+          className="p-3 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-2xl border border-zinc-200 dark:border-white/5 transition-all"
+          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -49,16 +61,18 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
 
         {/* Heading */}
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-white">Already open in another tab</h1>
-          <p className="text-zinc-400 leading-relaxed">
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            Already open in another tab
+          </h1>
+          <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
             Lantern only allows one active session per device. Another tab or window is currently
             connected.
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-zinc-900/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6 space-y-4 text-left">
-          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+        <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200 dark:border-white/5 rounded-3xl p-6 space-y-4 text-left">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
             What would you like to do?
           </p>
 
@@ -72,10 +86,10 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
               <ArrowRightCircle size={20} className="text-emerald-400" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                 {taking ? 'Taking over…' : 'Use This Tab'}
               </p>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
                 Disconnect the other tab and continue here
               </p>
             </div>
@@ -83,8 +97,8 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
 
           {/* Option B – stay blocked */}
           <div className="flex items-start gap-3 px-2 pt-1">
-            <div className="w-2 h-2 rounded-full bg-zinc-600 mt-1.5 shrink-0" />
-            <p className="text-xs text-zinc-500 leading-relaxed">
+            <div className="w-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-600 mt-1.5 shrink-0" />
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 leading-relaxed">
               Or switch to your existing Lantern tab. Only one session is allowed per device to keep
               the experience stable.
             </p>
@@ -92,7 +106,7 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
         </div>
 
         {/* Footer */}
-        <p className="text-xs text-zinc-600">
+        <p className="text-xs text-zinc-400 dark:text-zinc-600">
           This restriction is enforced in production to prevent multi-tab conflicts.
         </p>
       </motion.div>
