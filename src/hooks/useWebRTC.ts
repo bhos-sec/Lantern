@@ -6,7 +6,7 @@ import type {
   IncomingOfferPayload,
   IncomingAnswerPayload,
   IncomingIceCandidatePayload,
-} from "../../shared/types";
+} from "@shared/types";
 
 export interface RemoteStream {
   stream: MediaStream;
@@ -51,7 +51,7 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
   };
 
   const closeAllPeers = () => {
-    Object.values(peersRef.current).forEach((pc) => pc.close());
+    Object.values(peersRef.current).forEach((pc: RTCPeerConnection) => pc.close());
     peersRef.current = {};
     setRemoteStreams({});
   };

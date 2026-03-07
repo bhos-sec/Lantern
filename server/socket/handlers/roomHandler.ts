@@ -1,9 +1,9 @@
 import { Socket, Server } from "socket.io";
-import { userRepository } from "../../repositories/userRepository.js";
-import { roomRepository } from "../../repositories/roomRepository.js";
-import { broadcastPresence } from "../../services/presenceService.js";
-import { handleLeaveRoom } from "../../services/roomService.js";
-import type { JoinRoomPayload } from "../../../../shared/types.js";
+import { userRepository } from "../../repositories/userRepository";
+import { roomRepository } from "../../repositories/roomRepository";
+import { broadcastPresence } from "../../services/presenceService";
+import { handleLeaveRoom } from "../../services/roomService";
+import type { JoinRoomPayload } from "@shared/types";
 
 /** Handles room lifecycle: create, join, leave, privacy toggling, and cleanup on disconnect. */
 export function registerRoomHandlers(socket: Socket, io: Server): void {

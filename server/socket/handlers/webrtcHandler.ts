@@ -3,7 +3,7 @@ import type {
   OfferPayload,
   AnswerPayload,
   IceCandidatePayload,
-} from "../../../../shared/types.js";
+} from "@shared/types";
 
 /**
  * Relays WebRTC signaling messages between peers.

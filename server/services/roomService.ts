@@ -1,7 +1,7 @@
 import { Socket, Server } from "socket.io";
-import { userRepository } from "../repositories/userRepository.js";
-import { roomRepository } from "../repositories/roomRepository.js";
-import { broadcastPresence } from "../services/presenceService.js";
+import { userRepository } from "../repositories/userRepository";
+import { roomRepository } from "../repositories/roomRepository";
+import { broadcastPresence } from "../services/presenceService";
 
 /**
  * Handles room leave + cleanup for a given socket.

@@ -33,6 +33,12 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
     }
   }, [error]);
 
+  // Also re-enable the button whenever the user edits their name
+  useEffect(() => {
+    setHasSubmitted(false);
+  }, [userName]);
+  const media = useMedia();
+
   const enterLobby = () => {
     if (!userName.trim()) return;
     sound("click");

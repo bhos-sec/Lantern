@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Socket } from "socket.io-client";
-import type { Message } from "../../shared/types";
+import type { Message } from "@shared/types";
 
 interface UseRoomProps {
   socket: Socket;

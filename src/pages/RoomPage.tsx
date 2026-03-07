@@ -23,7 +23,7 @@ import { MediaSettingsModal } from "../components/ui/MediaSettingsModal";
 import { cn } from "../lib/utils";
 import type { UseMediaReturn } from "../hooks/useMedia";
 import type { RemoteStream } from "../hooks/useWebRTC";
-import type { Message } from "../../shared/types";
+import type { Message } from "@shared/types";
 
 interface RoomPageProps {
   roomId: string;
