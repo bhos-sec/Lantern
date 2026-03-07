@@ -3,7 +3,7 @@ import { registerUserHandlers } from "./handlers/userHandler";
 import { registerRoomHandlers } from "./handlers/roomHandler";
 import { registerChatHandlers } from "./handlers/chatHandler";
 import { registerWebRTCHandlers } from "./handlers/webrtcHandler";
-import { OWNER_KEY } from "../config.js";
+import { OWNER_KEY, IS_PROD } from "../config.js";
 
 /** Attach all domain-scoped event handlers to every new socket connection. */
 export function initSocketHandlers(io: Server): void {
@@ -14,8 +14,11 @@ export function initSocketHandlers(io: Server): void {
     };
 
     socket.data.deviceId = deviceId ?? null;
-    // Developer bypass: only active when OWNER_KEY is configured and matches
-    socket.data.isDeveloper = Boolean(OWNER_KEY) && ownerKey === OWNER_KEY;
+    // In development all connections bypass the multi-tab restriction so every
+    // developer can work freely without any configuration.
+    // In production the bypass requires a matching OWNER_KEY.
+    socket.data.isDeveloper =
+      !IS_PROD || (Boolean(OWNER_KEY) && ownerKey === OWNER_KEY);
 
     console.log(
       `User connected: ${socket.id}` +
