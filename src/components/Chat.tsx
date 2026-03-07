@@ -3,6 +3,8 @@ import { Send, LogOut, X, Lock } from 'lucide-react';
 import { Message } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
+const MAX_MSG_LENGTH = 500;
+
 interface ChatProps {
   messages: Message[];
   onSendMessage: (text: string) => void;
@@ -13,7 +15,15 @@ interface ChatProps {
   onClearPrivateRecipient?: () => void;
 }
 
-export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, currentUserId, onClose, hideHeader, privateRecipient, onClearPrivateRecipient }) => {
+export const Chat: React.FC<ChatProps> = ({
+  messages,
+  onSendMessage,
+  currentUserId,
+  onClose,
+  hideHeader,
+  privateRecipient,
+  onClearPrivateRecipient,
+}) => {
   const [inputText, setInputText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +45,9 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, currentUser
     <div className="flex flex-col h-full bg-transparent">
       {!hideHeader && (
         <div className="p-4 border-b border-white/5 flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Live Chat</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Live Chat
+          </h3>
           {onClose && (
             <button onClick={onClose} className="p-2 text-zinc-400 hover:text-white xl:hidden">
               <LogOut size={18} className="rotate-180" />
@@ -43,10 +55,13 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, currentUser
           )}
         </div>
       )}
-      
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+      >
         <AnimatePresence initial={false}>
-          {messages.map((msg) => (
+          {messages.map(msg => (
             <motion.div
               key={msg.id}
               initial={{ opacity: 0, y: 10 }}
@@ -55,15 +70,17 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, currentUser
             >
               <span className="text-[10px] text-zinc-500 mb-1 px-1 flex items-center gap-1">
                 {msg.isPrivate && <Lock size={10} className="text-emerald-500" />}
-                {msg.senderId === currentUserId && msg.isPrivate ? `To ${msg.toId === currentUserId ? 'You' : msg.toId}` : msg.sender}
+                {msg.senderId === currentUserId && msg.isPrivate
+                  ? `To ${msg.toId === currentUserId ? 'You' : msg.toId}`
+                  : msg.sender}
               </span>
               <div
                 className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${
                   msg.senderId === currentUserId
                     ? 'bg-emerald-600 text-white rounded-tr-none'
-                    : msg.isPrivate 
-                    ? 'bg-emerald-900/40 border border-emerald-500/30 text-emerald-100 rounded-tl-none'
-                    : 'bg-zinc-800 text-zinc-200 rounded-tl-none'
+                    : msg.isPrivate
+                      ? 'bg-emerald-900/40 border border-emerald-500/30 text-emerald-100 rounded-tl-none'
+                      : 'bg-zinc-800 text-zinc-200 rounded-tl-none'
                 }`}
               >
                 {msg.text}
@@ -78,10 +95,12 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, currentUser
           <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">
             <div className="flex items-center gap-2 text-xs text-emerald-500">
               <Lock size={12} />
-              <span>Private message to <strong>{privateRecipient.name}</strong></span>
+              <span>
+                Private message to <strong>{privateRecipient.name}</strong>
+              </span>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onClearPrivateRecipient}
               className="text-emerald-500 hover:text-emerald-400"
             >
@@ -93,10 +112,18 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, currentUser
           <input
             type="text"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={privateRecipient ? `Message ${privateRecipient.name}...` : "Type a message..."}
-            className="w-full bg-zinc-800 border border-white/5 rounded-full py-3 pl-5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+            onChange={e => setInputText(e.target.value.slice(0, MAX_MSG_LENGTH))}
+            maxLength={MAX_MSG_LENGTH}
+            placeholder={
+              privateRecipient ? `Message ${privateRecipient.name}...` : 'Type a message...'
+            }
+            className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-full py-3 pl-5 pr-12 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
           />
+          {inputText.length > MAX_MSG_LENGTH * 0.85 && (
+            <span className="absolute right-14 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 dark:text-zinc-500">
+              {inputText.length}/{MAX_MSG_LENGTH}
+            </span>
+          )}
           <button
             type="submit"
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-emerald-600 hover:bg-emerald-500 rounded-full transition-colors"

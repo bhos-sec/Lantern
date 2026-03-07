@@ -1,13 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/*
+ * Override the built-in `dark` variant so it activates via the `.dark` class
+ * on <html> rather than @media (prefers-color-scheme: dark).
+ * ThemeContext toggles this class and persists the choice to localStorage.
+ */
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Light mode is the default; dark mode overrides via the .dark class */
 body {
-  @apply bg-zinc-950 text-zinc-100 font-sans antialiased;
+  @apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans antialiased;
 }
 
 @layer utilities {
@@ -18,10 +26,18 @@ body {
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #27272a;
+    background: #d4d4d8;
     border-radius: 10px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
+    background: #a1a1aa;
   }
+}
+
+/* Dark-mode scrollbar overrides (outside @layer to ensure specificity) */
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }

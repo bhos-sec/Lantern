@@ -5,6 +5,7 @@ export interface UserRecord {
   name: string;
   roomId: string | null;
   showRoom: boolean;
+  isMuted?: boolean; // Force-muted by the room admin
 }
 
 const store = new Map<string, UserRecord>();
@@ -32,9 +33,7 @@ export const userRepository = {
   },
 
   isNameTaken(name: string): boolean {
-    return Array.from(store.values()).some(
-      (u) => u.name.toLowerCase() === name.toLowerCase()
-    );
+    return Array.from(store.values()).some(u => u.name.toLowerCase() === name.toLowerCase());
   },
 
   entries(): [string, UserRecord][] {
@@ -42,6 +41,6 @@ export const userRepository = {
   },
 
   countByRoom(roomId: string): number {
-    return Array.from(store.values()).filter((u) => u.roomId === roomId).length;
+    return Array.from(store.values()).filter(u => u.roomId === roomId).length;
   },
 };

@@ -1,7 +1,7 @@
-import React from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { Settings, X, Video, VideoOff, Mic, MicOff } from "lucide-react";
-import { cn } from "../../lib/utils";
+import React from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Settings, X, Video, VideoOff, Mic, MicOff, Blend } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface Props {
   open: boolean;
@@ -12,10 +12,12 @@ interface Props {
   selectedVideoDevice: string;
   startMuted: boolean;
   startVideoOff: boolean;
+  backgroundBlurEnabled?: boolean;
   onAudioDeviceChange: (id: string) => void;
   onVideoDeviceChange: (id: string) => void;
   onStartMutedChange: (v: boolean) => void;
   onStartVideoOffChange: (v: boolean) => void;
+  onBackgroundBlurChange?: (v: boolean) => void;
 }
 
 /** Modal for selecting camera/mic and setting join-time media defaults. */
@@ -28,10 +30,12 @@ export function MediaSettingsModal({
   selectedVideoDevice,
   startMuted,
   startVideoOff,
+  backgroundBlurEnabled = false,
   onAudioDeviceChange,
   onVideoDeviceChange,
   onStartMutedChange,
   onStartVideoOffChange,
+  onBackgroundBlurChange,
 }: Props) {
   return (
     <AnimatePresence>
@@ -41,17 +45,17 @@ export function MediaSettingsModal({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+            className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl"
           >
             {/* Header */}
-            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+            <div className="p-6 border-b border-zinc-200 dark:border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Settings className="text-emerald-500" size={20} />
-                <h2 className="text-lg font-bold text-white">Media Settings</h2>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white">Media Settings</h2>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 text-zinc-500 hover:text-white transition-colors"
+                className="p-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
                 <X size={20} />
               </button>
@@ -61,16 +65,16 @@ export function MediaSettingsModal({
               {/* Device selectors */}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-1">
                     Camera
                   </label>
                   <select
                     value={selectedVideoDevice}
-                    onChange={(e) => onVideoDeviceChange(e.target.value)}
-                    className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    onChange={e => onVideoDeviceChange(e.target.value)}
+                    className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     <option value="">Default Camera</option>
-                    {videoDevices.map((d) => (
+                    {videoDevices.map(d => (
                       <option key={d.deviceId} value={d.deviceId}>
                         {d.label || `Camera ${d.deviceId.slice(0, 5)}`}
                       </option>
@@ -79,16 +83,16 @@ export function MediaSettingsModal({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-1">
                     Microphone
                   </label>
                   <select
                     value={selectedAudioDevice}
-                    onChange={(e) => onAudioDeviceChange(e.target.value)}
-                    className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    onChange={e => onAudioDeviceChange(e.target.value)}
+                    className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     <option value="">Default Microphone</option>
-                    {audioDevices.map((d) => (
+                    {audioDevices.map(d => (
                       <option key={d.deviceId} value={d.deviceId}>
                         {d.label || `Microphone ${d.deviceId.slice(0, 5)}`}
                       </option>
@@ -99,35 +103,51 @@ export function MediaSettingsModal({
 
               {/* Join preferences */}
               <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+                <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-1">
                   Join Preferences
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => onStartVideoOffChange(!startVideoOff)}
                     className={cn(
-                      "flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium",
+                      'flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium',
                       startVideoOff
-                        ? "bg-red-500/10 border-red-500/50 text-red-500"
-                        : "bg-zinc-800 border-white/5 text-zinc-300"
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                        : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300',
                     )}
                   >
                     {startVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
-                    Video {startVideoOff ? "Off" : "On"}
+                    Video {startVideoOff ? 'Off' : 'On'}
                   </button>
                   <button
                     onClick={() => onStartMutedChange(!startMuted)}
                     className={cn(
-                      "flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium",
+                      'flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium',
                       startMuted
-                        ? "bg-red-500/10 border-red-500/50 text-red-500"
-                        : "bg-zinc-800 border-white/5 text-zinc-300"
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                        : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300',
                     )}
                   >
                     {startMuted ? <MicOff size={18} /> : <Mic size={18} />}
-                    Mic {startMuted ? "Off" : "On"}
+                    Mic {startMuted ? 'Off' : 'On'}
                   </button>
                 </div>
+
+                {/* Background blur toggle */}
+                {onBackgroundBlurChange && (
+                  <button
+                    onClick={() => onBackgroundBlurChange(!backgroundBlurEnabled)}
+                    className={cn(
+                      'w-full flex items-center justify-center gap-2 p-3 rounded-2xl border transition-all text-sm font-medium',
+                      backgroundBlurEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
+                        : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300',
+                    )}
+                  >
+                    <Blend size={16} />
+                    Background Blur {backgroundBlurEnabled ? 'On' : 'Off'}
+                  </button>
+                )}
               </div>
 
               <button

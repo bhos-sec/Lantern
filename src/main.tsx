@@ -2,15 +2,21 @@ import { StrictMode, Component, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { AppProvider } from './context/AppContext.tsx';
+import { ThemeProvider } from './context/ThemeContext.tsx';
 import './index.css';
 
-interface ErrorBoundaryState { hasError: boolean; message: string }
+interface ErrorBoundaryState {
+  hasError: boolean;
+  message: string;
+}
 
 class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false, message: '' };
-  }
+  // React 19 ships Component as an interface (not a concrete class) in its
+  // bundled TypeScript types, so `state` and `props` are not automatically
+  // inherited as instance members.  Declaring them explicitly here satisfies
+  // TypeScript 5.8 without emitting any extra runtime code.
+  declare props: Readonly<{ children: ReactNode }>;
+  state: ErrorBoundaryState = { hasError: false, message: '' };
 
   static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
     return {
@@ -45,10 +51,12 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </ErrorBoundary>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   </StrictMode>,
 );

@@ -1,7 +1,7 @@
-import { Server } from "socket.io";
-import { userRepository } from "../repositories/userRepository";
-import { roomRepository } from "../repositories/roomRepository";
-import type { PresenceUser } from "@shared/types";
+import { Server } from 'socket.io';
+import { userRepository } from '../repositories/userRepository';
+import { roomRepository } from '../repositories/roomRepository';
+import type { PresenceUser } from '@shared/types';
 
 /**
  * Build and broadcast the full presence snapshot to every connected client.
@@ -19,8 +19,9 @@ export function broadcastPresence(io: Server): void {
       actualRoomId: data.roomId,
       isAdmin: meta ? meta.adminId === id : false,
       isRoomPrivate: meta ? meta.isPrivate : false,
+      isMuted: data.isMuted ?? false,
     };
   });
 
-  io.emit("presence-update", userList);
+  io.emit('presence-update', userList);
 }
