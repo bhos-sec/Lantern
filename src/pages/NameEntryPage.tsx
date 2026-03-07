@@ -37,7 +37,6 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
   useEffect(() => {
     setHasSubmitted(false);
   }, [userName]);
-  const media = useMedia();
 
   const enterLobby = () => {
     if (!userName.trim()) return;

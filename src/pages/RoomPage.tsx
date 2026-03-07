@@ -54,6 +54,7 @@ export function RoomPage({
     setSoundEnabled,
     sound,
     userId,
+    userName,
   } = useAppContext();
 
   const [showChat, setShowChat] = useState(false);
@@ -193,7 +194,7 @@ export function RoomPage({
           <div className={gridClass}>
             <VideoPlayer
               stream={media.localStream}
-              userName={useAppContext().userName}
+              userName={userName}
               isLocal
               isFullscreen={fullscreenUserId === "local"}
               onToggleFullscreen={() => toggleFullscreen("local")}
