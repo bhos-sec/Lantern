@@ -1,6 +1,7 @@
 import { Socket, Server } from "socket.io";
 import { userRepository } from "../../repositories/userRepository";
 import { roomRepository } from "../../repositories/roomRepository";
+import { deviceSessionRepository } from "../../repositories/deviceSessionRepository";
 import { broadcastPresence } from "../../services/presenceService";
 import { handleLeaveRoom } from "../../services/roomService";
 import type { JoinRoomPayload } from "@shared/types";
@@ -80,6 +81,8 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
   });
 
   socket.on("disconnect", () => {
+    // Free the device session slot so the user can rejoin from a new tab.
+    deviceSessionRepository.removeBySocketId(socket.id);
     userRepository.remove(socket.id);
     broadcastPresence(io);
     console.log(`User disconnected: ${socket.id}`);
