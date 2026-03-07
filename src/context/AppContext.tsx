@@ -9,7 +9,7 @@ import React, {
 import { socket } from '../lib/socket';
 import { useNotifications } from '../hooks/useNotifications';
 import { playSound } from '../lib/sounds';
-import type { PresenceUser } from '@shared/types';
+import type { PresenceUser, RateLimitedPayload } from '@shared/types';
 
 export type AppStep = 'name' | 'lobby' | 'room';
 
@@ -89,6 +89,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addNotification(msg, 'error');
     });
 
+    // ── Rate-limit feedback ───────────────────────────────────────────────
+    socket.on('rate-limited', ({ message }: RateLimitedPayload) => {
+      setError(message);
+      addNotification(message, 'error');
+    });
+
     // ── Device-session events ─────────────────────────────────────────────
     // Server tells this tab it's a duplicate (another tab is already active).
     socket.on('duplicate-session', () => {
@@ -109,6 +115,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       socket.off('presence-update', setOnlineUsers);
       socket.off('name-set-success');
       socket.off('error');
+      socket.off('rate-limited');
       socket.off('duplicate-session');
       socket.off('session-taken-over');
       socket.off('take-over-granted');

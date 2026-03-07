@@ -3,11 +3,23 @@ import { userRepository } from '../../repositories/userRepository';
 import { roomRepository } from '../../repositories/roomRepository';
 import { broadcastPresence } from '../../services/presenceService';
 import { handleLeaveRoom } from '../../services/roomService';
+import { checkCooldown } from '../../lib/rateLimiter.js';
+import { JOIN_COOLDOWN_MS } from '../../config.js';
 import type { JoinRoomPayload } from '@shared/types';
 
 /** Handles room lifecycle: create, join, leave, privacy toggling, and cleanup on disconnect. */
 export function registerRoomHandlers(socket: Socket, io: Server): void {
   socket.on('join-room', (payload: JoinRoomPayload) => {
+    // ── Join throttling ───────────────────────────────────────────────────
+    if (!checkCooldown(socket.id, 'join-room', JOIN_COOLDOWN_MS)) {
+      socket.emit('rate-limited', {
+        action: 'join-room',
+        retryAfterMs: JOIN_COOLDOWN_MS,
+        message: `Please wait ${JOIN_COOLDOWN_MS / 1000}s before joining another room.`,
+      });
+      return;
+    }
+
     const { roomId, userName, password, isPrivate, isCreating } = payload;
     const existingMeta = roomRepository.get(roomId);
 
