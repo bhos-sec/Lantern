@@ -33,6 +33,10 @@ export function NameEntryPage() {
     }
   }, [error]);
 
+  // Also re-enable the button whenever the user edits their name
+  useEffect(() => {
+    setHasSubmitted(false);
+  }, [userName]);
   const media = useMedia();
 
   const enterLobby = () => {
