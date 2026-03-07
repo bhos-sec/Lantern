@@ -1,4 +1,4 @@
-import { io, Socket } from "socket.io-client";
+import { io, Socket } from 'socket.io-client';
 
 /**
  * Returns a stable device identifier that persists across page reloads and
@@ -7,7 +7,7 @@ import { io, Socket } from "socket.io-client";
  * value so the app still works.
  */
 function getDeviceId(): string {
-  const KEY = "lantern_device_id";
+  const KEY = 'lantern_device_id';
   try {
     let id = localStorage.getItem(KEY);
     if (!id) {

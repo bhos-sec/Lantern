@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { motion } from "motion/react";
-import { MonitorX, ArrowRightCircle, Zap } from "lucide-react";
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
+import { MonitorX, ArrowRightCircle, Zap } from 'lucide-react';
 
 interface Props {
   /** Callback to claim this tab as the active session ("Use This Tab"). */
@@ -49,12 +49,10 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
 
         {/* Heading */}
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-white">
-            Already open in another tab
-          </h1>
+          <h1 className="text-2xl font-bold text-white">Already open in another tab</h1>
           <p className="text-zinc-400 leading-relaxed">
-            Lantern only allows one active session per device. Another tab or
-            window is currently connected.
+            Lantern only allows one active session per device. Another tab or window is currently
+            connected.
           </p>
         </div>
 
@@ -75,7 +73,7 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">
-                {taking ? "Taking over…" : "Use This Tab"}
+                {taking ? 'Taking over…' : 'Use This Tab'}
               </p>
               <p className="text-xs text-zinc-500 mt-0.5">
                 Disconnect the other tab and continue here
@@ -87,16 +85,15 @@ export function DuplicateSessionPage({ onTakeOver }: Props) {
           <div className="flex items-start gap-3 px-2 pt-1">
             <div className="w-2 h-2 rounded-full bg-zinc-600 mt-1.5 shrink-0" />
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Or switch to your existing Lantern tab. Only one session is
-              allowed per device to keep the experience stable.
+              Or switch to your existing Lantern tab. Only one session is allowed per device to keep
+              the experience stable.
             </p>
           </div>
         </div>
 
         {/* Footer */}
         <p className="text-xs text-zinc-600">
-          This restriction is enforced in production to prevent multi-tab
-          conflicts.
+          This restriction is enforced in production to prevent multi-tab conflicts.
         </p>
       </motion.div>
     </div>

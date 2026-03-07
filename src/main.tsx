@@ -4,7 +4,10 @@ import App from './App.tsx';
 import { AppProvider } from './context/AppContext.tsx';
 import './index.css';
 
-interface ErrorBoundaryState { hasError: boolean; message: string }
+interface ErrorBoundaryState {
+  hasError: boolean;
+  message: string;
+}
 
 class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
   // React 19 ships Component as an interface (not a concrete class) in its

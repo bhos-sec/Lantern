@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { Zap, Settings, Volume2, VolumeX } from "lucide-react";
-import { socket } from "../lib/socket";
-import { useAppContext } from "../context/AppContext";
-import { MediaSettingsModal } from "../components/ui/MediaSettingsModal";
-import type { UseMediaReturn } from "../hooks/useMedia";
-import { cn } from "../lib/utils";
+import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { Zap, Settings, Volume2, VolumeX } from 'lucide-react';
+import { socket } from '../lib/socket';
+import { useAppContext } from '../context/AppContext';
+import { MediaSettingsModal } from '../components/ui/MediaSettingsModal';
+import type { UseMediaReturn } from '../hooks/useMedia';
+import { cn } from '../lib/utils';
 
 /**
  * Step 1 — Name entry.
@@ -13,15 +13,8 @@ import { cn } from "../lib/utils";
  * and AppContext transitions to the lobby.
  */
 export function NameEntryPage({ media }: { media: UseMediaReturn }) {
-  const {
-    userName,
-    setUserName,
-    onlineUsers,
-    soundEnabled,
-    setSoundEnabled,
-    sound,
-    error,
-  } = useAppContext();
+  const { userName, setUserName, onlineUsers, soundEnabled, setSoundEnabled, sound, error } =
+    useAppContext();
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -40,9 +33,9 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
 
   const enterLobby = () => {
     if (!userName.trim()) return;
-    sound("click");
+    sound('click');
     setHasSubmitted(true);
-    socket.emit("set-name", userName);
+    socket.emit('set-name', userName);
   };
 
   return (
@@ -50,19 +43,25 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
       {/* Top-right controls */}
       <div className="absolute top-6 right-6 flex items-center gap-2">
         <button
-          onClick={() => { sound("click"); setSoundEnabled(!soundEnabled); }}
+          onClick={() => {
+            sound('click');
+            setSoundEnabled(!soundEnabled);
+          }}
           className={cn(
-            "p-3 rounded-2xl border transition-all",
+            'p-3 rounded-2xl border transition-all',
             soundEnabled
-              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
-              : "bg-zinc-800 border-white/5 text-zinc-500"
+              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+              : 'bg-zinc-800 border-white/5 text-zinc-500',
           )}
-          title={soundEnabled ? "Mute sounds" : "Unmute sounds"}
+          title={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
         <button
-          onClick={() => { sound("click"); setShowSettings(true); }}
+          onClick={() => {
+            sound('click');
+            setShowSettings(true);
+          }}
           className="p-3 bg-zinc-900 text-zinc-400 hover:text-white rounded-2xl border border-white/5 transition-all"
           title="Media Settings"
         >
@@ -95,8 +94,8 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
                 type="text"
                 placeholder="Enter your name"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && enterLobby()}
+                onChange={e => setUserName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && enterLobby()}
                 className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-600"
               />
             </div>
@@ -132,7 +131,7 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {onlineUsers.slice(0, 5).map((user) => (
+                {onlineUsers.slice(0, 5).map(user => (
                   <div
                     key={user.id}
                     className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800/50 border border-white/5 rounded-xl text-[10px] text-zinc-300"

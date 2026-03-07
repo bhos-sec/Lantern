@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   Hash,
   Shield,
@@ -14,16 +14,16 @@ import {
   Settings,
   Volume2,
   VolumeX,
-} from "lucide-react";
-import { socket } from "../lib/socket";
-import { useAppContext } from "../context/AppContext";
-import { VideoPlayer } from "../components/VideoPlayer";
-import { Sidebar } from "../components/Sidebar";
-import { MediaSettingsModal } from "../components/ui/MediaSettingsModal";
-import { cn } from "../lib/utils";
-import type { UseMediaReturn } from "../hooks/useMedia";
-import type { RemoteStream } from "../hooks/useWebRTC";
-import type { Message } from "@shared/types";
+} from 'lucide-react';
+import { socket } from '../lib/socket';
+import { useAppContext } from '../context/AppContext';
+import { VideoPlayer } from '../components/VideoPlayer';
+import { Sidebar } from '../components/Sidebar';
+import { MediaSettingsModal } from '../components/ui/MediaSettingsModal';
+import { cn } from '../lib/utils';
+import type { UseMediaReturn } from '../hooks/useMedia';
+import type { RemoteStream } from '../hooks/useWebRTC';
+import type { Message } from '@shared/types';
 
 interface RoomPageProps {
   roomId: string;
@@ -48,35 +48,27 @@ export function RoomPage({
   onLeaveRoom,
   onTogglePrivacy,
 }: RoomPageProps) {
-  const {
-    onlineUsers,
-    soundEnabled,
-    setSoundEnabled,
-    sound,
-    userId,
-    userName,
-  } = useAppContext();
+  const { onlineUsers, soundEnabled, setSoundEnabled, sound, userId, userName } = useAppContext();
 
   const [showChat, setShowChat] = useState(false);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<"chat" | "room" | "all">("chat");
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'chat' | 'room' | 'all'>('chat');
   const [showSettings, setShowSettings] = useState(false);
   const [fullscreenUserId, setFullscreenUserId] = useState<string | null>(null);
 
-  const currentUser = onlineUsers.find((u) => u.id === userId);
+  const currentUser = onlineUsers.find(u => u.id === userId);
   const isAdmin = currentUser?.isAdmin ?? false;
   const isRoomPrivate = currentUser?.isRoomPrivate ?? false;
 
-  const toggleFullscreen = (id: string) =>
-    setFullscreenUserId((prev) => (prev === id ? null : id));
+  const toggleFullscreen = (id: string) => setFullscreenUserId(prev => (prev === id ? null : id));
 
   // Responsive grid class based on number of participants
   const gridClass = cn(
-    "grid gap-4 md:gap-6 auto-rows-fr",
+    'grid gap-4 md:gap-6 auto-rows-fr',
     Object.keys(remoteStreams).length === 0
-      ? "grid-cols-1 max-w-4xl mx-auto"
+      ? 'grid-cols-1 max-w-4xl mx-auto'
       : Object.keys(remoteStreams).length === 1
-      ? "grid-cols-1 md:grid-cols-2"
-      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        ? 'grid-cols-1 md:grid-cols-2'
+        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
   );
 
   return (
@@ -97,49 +89,58 @@ export function RoomPage({
             {/* Privacy toggle (admin) or badge (member) */}
             {isAdmin ? (
               <button
-                onClick={() => { sound("click"); onTogglePrivacy(!isRoomPrivate); }}
+                onClick={() => {
+                  sound('click');
+                  onTogglePrivacy(!isRoomPrivate);
+                }}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1 rounded-full border transition-all text-[10px] font-medium",
+                  'flex items-center gap-2 px-3 py-1 rounded-full border transition-all text-[10px] font-medium',
                   isRoomPrivate
-                    ? "bg-red-500/10 border-red-500/50 text-red-500"
-                    : "bg-emerald-500/10 border-emerald-500/50 text-emerald-500"
+                    ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                    : 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500',
                 )}
-                title={isRoomPrivate ? "Room is private" : "Room is public"}
+                title={isRoomPrivate ? 'Room is private' : 'Room is public'}
               >
                 {isRoomPrivate ? <Shield size={12} /> : <Zap size={12} />}
-                <span className="hidden sm:inline">{isRoomPrivate ? "Private" : "Public"}</span>
+                <span className="hidden sm:inline">{isRoomPrivate ? 'Private' : 'Public'}</span>
               </button>
             ) : (
               <div
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-medium opacity-60",
+                  'flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-medium opacity-60',
                   isRoomPrivate
-                    ? "bg-red-500/10 border-red-500/20 text-red-500"
-                    : "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                    ? 'bg-red-500/10 border-red-500/20 text-red-500'
+                    : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500',
                 )}
               >
                 {isRoomPrivate ? <Shield size={12} /> : <Zap size={12} />}
-                <span className="hidden sm:inline">{isRoomPrivate ? "Private" : "Public"}</span>
+                <span className="hidden sm:inline">{isRoomPrivate ? 'Private' : 'Public'}</span>
               </div>
             )}
 
             <div className="hidden sm:block h-4 w-px bg-white/10" />
 
             <button
-              onClick={() => { sound("click"); setSoundEnabled(!soundEnabled); }}
+              onClick={() => {
+                sound('click');
+                setSoundEnabled(!soundEnabled);
+              }}
               className={cn(
-                "p-2 rounded-lg transition-all border",
+                'p-2 rounded-lg transition-all border',
                 soundEnabled
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
-                  : "bg-zinc-800 border-white/5 text-zinc-500"
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                  : 'bg-zinc-800 border-white/5 text-zinc-500',
               )}
-              title={soundEnabled ? "Mute sounds" : "Unmute sounds"}
+              title={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
             >
               {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             </button>
 
             <button
-              onClick={() => { sound("click"); setShowSettings(true); }}
+              onClick={() => {
+                sound('click');
+                setShowSettings(true);
+              }}
               className="p-2 bg-zinc-900 text-zinc-400 hover:text-white rounded-lg border border-white/5 transition-all"
               title="Media Settings"
             >
@@ -160,19 +161,25 @@ export function RoomPage({
           <div className="flex items-center gap-2 md:gap-3">
             {/* Mobile chat toggle */}
             <button
-              onClick={() => { sound("click"); setShowChat((v) => !v); }}
+              onClick={() => {
+                sound('click');
+                setShowChat(v => !v);
+              }}
               className={cn(
-                "p-2 rounded-full transition-all border border-white/5 xl:hidden",
+                'p-2 rounded-full transition-all border border-white/5 xl:hidden',
                 showChat
-                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/50"
-                  : "bg-zinc-800 text-zinc-400"
+                  ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/50'
+                  : 'bg-zinc-800 text-zinc-400',
               )}
             >
               <Users size={18} />
             </button>
 
             <button
-              onClick={() => { sound("click"); onLeaveRoom(); }}
+              onClick={() => {
+                sound('click');
+                onLeaveRoom();
+              }}
               className="flex items-center gap-2 px-3 md:px-4 py-2 bg-zinc-800 hover:bg-red-500/10 hover:text-red-500 text-zinc-400 rounded-full text-xs md:text-sm font-medium transition-all border border-white/5"
             >
               <LogOut size={16} />
@@ -196,8 +203,8 @@ export function RoomPage({
               stream={media.localStream}
               userName={userName}
               isLocal
-              isFullscreen={fullscreenUserId === "local"}
-              onToggleFullscreen={() => toggleFullscreen("local")}
+              isFullscreen={fullscreenUserId === 'local'}
+              onToggleFullscreen={() => toggleFullscreen('local')}
             />
             {Object.entries(remoteStreams).map(([id, data]) => (
               <VideoPlayer
@@ -215,10 +222,10 @@ export function RoomPage({
         <AnimatePresence>
           {showChat && (
             <motion.div
-              initial={{ x: "100%" }}
+              initial={{ x: '100%' }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="absolute inset-0 z-30 xl:hidden"
             >
               <Sidebar
@@ -242,24 +249,30 @@ export function RoomPage({
         <footer className="h-20 md:h-24 flex items-center justify-center px-4 md:px-6 border-t border-white/5 bg-zinc-900/30 backdrop-blur-md">
           <div className="flex items-center gap-2 md:gap-4">
             <button
-              onClick={() => { sound("click"); media.toggleMute(); }}
+              onClick={() => {
+                sound('click');
+                media.toggleMute();
+              }}
               className={cn(
-                "p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border",
+                'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
                 media.isMuted
-                  ? "bg-red-500/10 border-red-500/50 text-red-500"
-                  : "bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700"
+                  ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                  : 'bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700',
               )}
             >
               {media.isMuted ? <MicOff size={20} /> : <Mic size={20} />}
             </button>
 
             <button
-              onClick={() => { sound("click"); media.toggleVideo(); }}
+              onClick={() => {
+                sound('click');
+                media.toggleVideo();
+              }}
               className={cn(
-                "p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border",
+                'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
                 media.isVideoOff
-                  ? "bg-red-500/10 border-red-500/50 text-red-500"
-                  : "bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700"
+                  ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                  : 'bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700',
               )}
             >
               {media.isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
@@ -268,17 +281,20 @@ export function RoomPage({
             <div className="w-px h-6 md:h-8 bg-white/10 mx-1 md:mx-2" />
 
             <button
-              onClick={() => { sound("click"); media.toggleScreenShare({}); }}
+              onClick={() => {
+                sound('click');
+                media.toggleScreenShare({});
+              }}
               className={cn(
-                "flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all border font-semibold",
+                'flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all border font-semibold',
                 media.isScreenSharing
-                  ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-500"
-                  : "bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700"
+                  ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
+                  : 'bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700',
               )}
             >
               <Monitor size={20} />
               <span className="text-xs md:text-sm">
-                {media.isScreenSharing ? "Sharing" : "Share"}
+                {media.isScreenSharing ? 'Sharing' : 'Share'}
               </span>
             </button>
           </div>

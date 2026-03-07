@@ -21,8 +21,15 @@ import { DuplicateSessionPage } from './pages/DuplicateSessionPage';
  */
 export default function App() {
   const {
-    step, setStep, userName, notifications, addNotification, sound,
-    isDuplicateSession, isSessionTakenOver, takeOverSession,
+    step,
+    setStep,
+    userName,
+    notifications,
+    addNotification,
+    sound,
+    isDuplicateSession,
+    isSessionTakenOver,
+    takeOverSession,
   } = useAppContext();
   const [roomId, setRoomId] = useState('');
 
@@ -45,7 +52,9 @@ export default function App() {
       if (msg.senderId !== socket.id) sound('message');
     };
     socket.on('receive-message', handleMessage);
-    return () => { socket.off('receive-message', handleMessage); };
+    return () => {
+      socket.off('receive-message', handleMessage);
+    };
   }, [addMessage, sound]);
 
   // Transition into the room view once the server confirms the join
@@ -58,11 +67,14 @@ export default function App() {
         const audio = media.localStream.getAudioTracks()[0];
         const video = media.localStream.getVideoTracks()[0];
         // The useMedia hook keeps isMuted / isVideoOff in sync via acquireMedia
-        _ = audio; _ = video; // already set inside acquireMedia
+        _ = audio;
+        _ = video; // already set inside acquireMedia
       }
     };
     socket.on('join-room-success', handleJoinSuccess);
-    return () => { socket.off('join-room-success', handleJoinSuccess); };
+    return () => {
+      socket.off('join-room-success', handleJoinSuccess);
+    };
   }, [media.localStream, setStep]);
 
   // Server closes the room (admin left)
@@ -72,17 +84,14 @@ export default function App() {
       addNotification('The room was closed by the admin.', 'info');
     };
     socket.on('room-closed', handleRoomClosed);
-    return () => { socket.off('room-closed', handleRoomClosed); };
+    return () => {
+      socket.off('room-closed', handleRoomClosed);
+    };
   }, []);
 
   /** Acquire media then ask the server to join/create the room. */
   const joinRoom = useCallback(
-    async (
-      idToJoin: string,
-      password?: string,
-      isPrivate?: boolean,
-      isCreating?: boolean,
-    ) => {
+    async (idToJoin: string, password?: string, isPrivate?: boolean, isCreating?: boolean) => {
       if (!idToJoin || !userName) return;
       const stream = await media.acquireMedia();
       if (!stream) return; // Permission denied — acquireMedia shows the alert
@@ -129,8 +138,8 @@ export default function App() {
           <div className="space-y-2">
             <h2 className="text-xl font-bold text-white">Session moved</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Your Lantern session was opened in another tab. Close this window
-              or refresh to start a new session.
+              Your Lantern session was opened in another tab. Close this window or refresh to start
+              a new session.
             </p>
           </div>
           <button

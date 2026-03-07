@@ -1,14 +1,14 @@
-import { Server, Socket } from "socket.io";
-import { registerUserHandlers } from "./handlers/userHandler";
-import { registerRoomHandlers } from "./handlers/roomHandler";
-import { registerChatHandlers } from "./handlers/chatHandler";
-import { registerWebRTCHandlers } from "./handlers/webrtcHandler";
-import { deviceSessionRepository } from "../repositories/deviceSessionRepository.js";
-import { IS_PROD } from "../config.js";
+import { Server, Socket } from 'socket.io';
+import { registerUserHandlers } from './handlers/userHandler';
+import { registerRoomHandlers } from './handlers/roomHandler';
+import { registerChatHandlers } from './handlers/chatHandler';
+import { registerWebRTCHandlers } from './handlers/webrtcHandler';
+import { deviceSessionRepository } from '../repositories/deviceSessionRepository.js';
+import { IS_PROD } from '../config.js';
 
 /** Attach all domain-scoped event handlers to every new socket connection. */
 export function initSocketHandlers(io: Server): void {
-  io.on("connection", (socket: Socket) => {
+  io.on('connection', (socket: Socket) => {
     console.log(`User connected: ${socket.id}`);
 
     // ── Device-session enforcement (production only) ──────────────────────
@@ -25,7 +25,7 @@ export function initSocketHandlers(io: Server): void {
       if (existingSocketId) {
         // Another tab/window on the same device is already connected.
         socket.data.isDuplicate = true;
-        socket.emit("duplicate-session");
+        socket.emit('duplicate-session');
         console.log(`Duplicate session blocked – device: ${deviceId}, socket: ${socket.id}`);
       }
     }
@@ -40,13 +40,13 @@ export function initSocketHandlers(io: Server): void {
     // When the user clicks "Use This Tab" on the DuplicateSessionPage,
     // the client emits this event.  We kick the old socket and grant the
     // new one a clean session.
-    socket.on("take-over-session", () => {
+    socket.on('take-over-session', () => {
       if (!IS_PROD || !deviceId) return;
 
       const oldSocketId = deviceSessionRepository.getByDeviceId(deviceId);
       if (oldSocketId && oldSocketId !== socket.id) {
         // Notify the old tab so it can display a "taken over" screen
-        io.to(oldSocketId).emit("session-taken-over");
+        io.to(oldSocketId).emit('session-taken-over');
         // Give the old tab a moment to react before forcibly disconnecting it
         setTimeout(() => {
           io.sockets.sockets.get(oldSocketId)?.disconnect(true);
@@ -55,12 +55,12 @@ export function initSocketHandlers(io: Server): void {
 
       deviceSessionRepository.forceRegister(deviceId, socket.id);
       socket.data.isDuplicate = false;
-      socket.emit("take-over-granted");
+      socket.emit('take-over-granted');
       console.log(`Session taken over – device: ${deviceId}, new socket: ${socket.id}`);
     });
 
     // ── Clean up on disconnect ────────────────────────────────────────────
-    socket.on("disconnect", () => {
+    socket.on('disconnect', () => {
       if (deviceId) {
         deviceSessionRepository.unregisterBySocket(socket.id);
       }

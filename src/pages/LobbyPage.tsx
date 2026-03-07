@@ -1,19 +1,11 @@
-import React, { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import {
-  Hash,
-  Shield,
-  Zap,
-  Users,
-  Settings,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
-import { socket } from "../lib/socket";
-import { useAppContext } from "../context/AppContext";
-import type { UseMediaReturn } from "../hooks/useMedia";
-import { MediaSettingsModal } from "../components/ui/MediaSettingsModal";
-import { cn } from "../lib/utils";
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Hash, Shield, Zap, Users, Settings, Volume2, VolumeX } from 'lucide-react';
+import { socket } from '../lib/socket';
+import { useAppContext } from '../context/AppContext';
+import type { UseMediaReturn } from '../hooks/useMedia';
+import { MediaSettingsModal } from '../components/ui/MediaSettingsModal';
+import { cn } from '../lib/utils';
 
 interface LobbyPageProps {
   media: UseMediaReturn;
@@ -22,7 +14,7 @@ interface LobbyPageProps {
     idToJoin: string,
     password?: string,
     isPrivate?: boolean,
-    isCreating?: boolean
+    isCreating?: boolean,
   ) => Promise<void>;
 }
 
@@ -31,30 +23,21 @@ interface LobbyPageProps {
  * Users can create or join a room, see active public rooms, and browse online users.
  */
 export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
-  const {
-    userName,
-    onlineUsers,
-    soundEnabled,
-    setSoundEnabled,
-    sound,
-    setStep,
-    error,
-  } = useAppContext();
+  const { userName, onlineUsers, soundEnabled, setSoundEnabled, sound, setStep, error } =
+    useAppContext();
 
-  const [roomId, setRoomId] = useState("");
-  const [roomPassword, setRoomPassword] = useState("");
+  const [roomId, setRoomId] = useState('');
+  const [roomPassword, setRoomPassword] = useState('');
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
-  const [sessionTab, setSessionTab] = useState<"create" | "join">("create");
-  const [lobbyTab, setLobbyTab] = useState<"rooms" | "people">("rooms");
+  const [sessionTab, setSessionTab] = useState<'create' | 'join'>('create');
+  const [lobbyTab, setLobbyTab] = useState<'rooms' | 'people'>('rooms');
   const [showSettings, setShowSettings] = useState(false);
 
   // Unique public rooms visible to this client
-  const activeRooms = [
-    ...new Set(onlineUsers.map((u) => u.roomId).filter(Boolean)),
-  ] as string[];
+  const activeRooms = [...new Set(onlineUsers.map(u => u.roomId).filter(Boolean))] as string[];
 
   const handleJoin = (id: string, pw?: string, priv?: boolean, creating?: boolean) => {
-    sound("click");
+    sound('click');
     onJoinRoom(id, pw, priv, creating);
   };
 
@@ -70,32 +53,40 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-white">Lantern Lobby</h1>
             <p className="text-zinc-500 text-sm">
-              You are online as{" "}
-              <span className="text-emerald-500 font-bold">{userName}</span>
+              You are online as <span className="text-emerald-500 font-bold">{userName}</span>
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { sound("click"); setSoundEnabled(!soundEnabled); }}
+              onClick={() => {
+                sound('click');
+                setSoundEnabled(!soundEnabled);
+              }}
               className={cn(
-                "p-2 rounded-xl border transition-all",
+                'p-2 rounded-xl border transition-all',
                 soundEnabled
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
-                  : "bg-zinc-800 border-white/5 text-zinc-500"
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                  : 'bg-zinc-800 border-white/5 text-zinc-500',
               )}
-              title={soundEnabled ? "Mute sounds" : "Unmute sounds"}
+              title={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
             >
               {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
             <button
-              onClick={() => { sound("click"); setShowSettings(true); }}
+              onClick={() => {
+                sound('click');
+                setShowSettings(true);
+              }}
               className="p-2 bg-zinc-900 text-zinc-400 hover:text-white rounded-xl border border-white/5 transition-all"
               title="Media Settings"
             >
               <Settings size={18} />
             </button>
             <button
-              onClick={() => { sound("click"); setStep("name"); }}
+              onClick={() => {
+                sound('click');
+                setStep('name');
+              }}
               className="px-4 py-2 bg-zinc-900 text-zinc-400 hover:text-white rounded-xl border border-white/5 transition-all text-sm"
             >
               Change Name
@@ -107,15 +98,18 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
           {/* Create / Join panel */}
           <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-8 rounded-3xl shadow-2xl space-y-6">
             <div className="flex items-center gap-1 bg-zinc-800/50 p-1 rounded-2xl">
-              {(["create", "join"] as const).map((tab) => (
+              {(['create', 'join'] as const).map(tab => (
                 <button
                   key={tab}
-                  onClick={() => { sound("click"); setSessionTab(tab); }}
+                  onClick={() => {
+                    sound('click');
+                    setSessionTab(tab);
+                  }}
                   className={cn(
-                    "flex-1 py-2 rounded-xl text-xs font-bold transition-all capitalize",
+                    'flex-1 py-2 rounded-xl text-xs font-bold transition-all capitalize',
                     sessionTab === tab
-                      ? "bg-zinc-700 text-white"
-                      : "text-zinc-500 hover:text-zinc-300"
+                      ? 'bg-zinc-700 text-white'
+                      : 'text-zinc-500 hover:text-zinc-300',
                   )}
                 >
                   {tab}
@@ -127,36 +121,42 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
               <div className="space-y-3">
                 {/* Room ID input */}
                 <div className="relative">
-                  <Hash className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
+                  <Hash
+                    className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600"
+                    size={18}
+                  />
                   <input
                     type="text"
                     placeholder="Room ID"
                     value={roomId}
-                    onChange={(e) => setRoomId(e.target.value)}
+                    onChange={e => setRoomId(e.target.value)}
                     className="w-full bg-zinc-800 border border-white/5 rounded-2xl pl-12 pr-5 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-600 text-sm"
                   />
                 </div>
 
                 {/* Password input */}
                 <div className="relative">
-                  <Shield className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
+                  <Shield
+                    className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600"
+                    size={18}
+                  />
                   <input
                     type="password"
                     placeholder="Password (Optional)"
                     value={roomPassword}
-                    onChange={(e) => setRoomPassword(e.target.value)}
+                    onChange={e => setRoomPassword(e.target.value)}
                     className="w-full bg-zinc-800 border border-white/5 rounded-2xl pl-12 pr-5 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-600 text-sm"
                   />
                 </div>
 
-                {sessionTab === "create" && (
+                {sessionTab === 'create' && (
                   <label className="flex items-center gap-3 p-4 bg-zinc-800/50 border border-white/5 rounded-2xl cursor-pointer hover:bg-zinc-800 transition-all group">
                     <div
                       className={cn(
-                        "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
+                        'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
                         isPrivateRoom
-                          ? "bg-emerald-500 border-emerald-500"
-                          : "border-zinc-600 group-hover:border-zinc-500"
+                          ? 'bg-emerald-500 border-emerald-500'
+                          : 'border-zinc-600 group-hover:border-zinc-500',
                       )}
                     >
                       {isPrivateRoom && <Zap size={12} className="text-white fill-current" />}
@@ -165,7 +165,10 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                       type="checkbox"
                       className="hidden"
                       checked={isPrivateRoom}
-                      onChange={(e) => { sound("click"); setIsPrivateRoom(e.target.checked); }}
+                      onChange={e => {
+                        sound('click');
+                        setIsPrivateRoom(e.target.checked);
+                      }}
                     />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-zinc-200">Private Room</span>
@@ -185,12 +188,12 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
 
               <button
                 onClick={() =>
-                  handleJoin(roomId, roomPassword, isPrivateRoom, sessionTab === "create")
+                  handleJoin(roomId, roomPassword, isPrivateRoom, sessionTab === 'create')
                 }
                 disabled={!roomId.trim()}
                 className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-600/20"
               >
-                {sessionTab === "create" ? "Create & Join" : "Join Room"}
+                {sessionTab === 'create' ? 'Create & Join' : 'Join Room'}
               </button>
             </div>
           </div>
@@ -199,24 +202,30 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
           <div className="lg:col-span-2 bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-8 rounded-3xl shadow-2xl flex flex-col">
             <div className="flex items-center gap-1 bg-zinc-800/50 p-1 rounded-2xl mb-6">
               <button
-                onClick={() => { sound("click"); setLobbyTab("rooms"); }}
+                onClick={() => {
+                  sound('click');
+                  setLobbyTab('rooms');
+                }}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all",
-                  lobbyTab === "rooms"
-                    ? "bg-emerald-600 text-white shadow-lg"
-                    : "text-zinc-500 hover:text-zinc-300"
+                  'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all',
+                  lobbyTab === 'rooms'
+                    ? 'bg-emerald-600 text-white shadow-lg'
+                    : 'text-zinc-500 hover:text-zinc-300',
                 )}
               >
                 <Hash size={18} />
                 Active Rooms
               </button>
               <button
-                onClick={() => { sound("click"); setLobbyTab("people"); }}
+                onClick={() => {
+                  sound('click');
+                  setLobbyTab('people');
+                }}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all",
-                  lobbyTab === "people"
-                    ? "bg-emerald-600 text-white shadow-lg"
-                    : "text-zinc-500 hover:text-zinc-300"
+                  'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all',
+                  lobbyTab === 'people'
+                    ? 'bg-emerald-600 text-white shadow-lg'
+                    : 'text-zinc-500 hover:text-zinc-300',
                 )}
               >
                 <Users size={18} />
@@ -226,7 +235,7 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
 
             <div className="flex-1 overflow-y-auto max-h-[400px] pr-2 scrollbar-thin">
               <AnimatePresence mode="wait">
-                {lobbyTab === "rooms" ? (
+                {lobbyTab === 'rooms' ? (
                   <motion.div
                     key="rooms"
                     initial={{ opacity: 0, y: 10 }}
@@ -240,7 +249,7 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                         <p className="text-sm">No public rooms active</p>
                       </div>
                     ) : (
-                      activeRooms.map((room) => (
+                      activeRooms.map(room => (
                         <div
                           key={room}
                           className="flex items-center justify-between p-4 bg-zinc-800/50 border border-white/5 rounded-2xl group"
@@ -252,7 +261,7 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                             <div className="flex flex-col">
                               <span className="font-medium text-zinc-200">{room}</span>
                               <span className="text-[10px] text-zinc-500">
-                                {onlineUsers.filter((u) => u.roomId === room).length} People
+                                {onlineUsers.filter(u => u.roomId === room).length} People
                               </span>
                             </div>
                           </div>
@@ -274,15 +283,15 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="grid grid-cols-1 md:grid-cols-2 gap-3"
                   >
-                    {onlineUsers.filter((u) => u.id !== socket.id).length === 0 ? (
+                    {onlineUsers.filter(u => u.id !== socket.id).length === 0 ? (
                       <div className="col-span-full h-48 flex flex-col items-center justify-center text-zinc-600 border-2 border-dashed border-white/5 rounded-2xl">
                         <Users size={40} className="mb-3 opacity-20" />
                         <p className="text-sm">You're the only one here!</p>
                       </div>
                     ) : (
                       onlineUsers
-                        .filter((u) => u.id !== socket.id)
-                        .map((user) => (
+                        .filter(u => u.id !== socket.id)
+                        .map(user => (
                           <div
                             key={user.id}
                             className="flex items-center justify-between p-4 bg-zinc-800/50 border border-white/5 rounded-2xl"
@@ -297,8 +306,8 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                                   {user.roomId
                                     ? `In: ${user.roomId}`
                                     : user.actualRoomId
-                                    ? "In Private Room"
-                                    : "In Lobby"}
+                                      ? 'In Private Room'
+                                      : 'In Lobby'}
                                 </span>
                               </div>
                             </div>

@@ -99,17 +99,17 @@ export interface IncomingIceCandidatePayload {
  * The client should render the DuplicateSessionPage and optionally let the
  * user emit "take-over-session" to claim this tab.
  */
-export type DuplicateSessionEvent = "duplicate-session";
+export type DuplicateSessionEvent = 'duplicate-session';
 
 /**
  * Emitted to the *old* tab when a newer tab from the same device exercises
  * the "Use This Tab" / take-over action.  The old tab should render a
  * "session moved" screen and stop interacting with the server.
  */
-export type SessionTakenOverEvent = "session-taken-over";
+export type SessionTakenOverEvent = 'session-taken-over';
 
 /**
  * Emitted back to the *new* tab after the server grants the take-over.
  * The client clears the duplicate-session state and proceeds normally.
  */
-export type TakeOverGrantedEvent = "take-over-granted";
+export type TakeOverGrantedEvent = 'take-over-granted';
