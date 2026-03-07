@@ -78,6 +78,22 @@ export function RoomPage({
   const isAdmin = currentUser?.isAdmin ?? false;
   const isRoomPrivate = currentUser?.isRoomPrivate ?? false;
 
+  const handleMuteUser = (userId: string) => {
+    socket.emit('mute-user', { userId, roomId });
+  };
+
+  const handleUnmuteUser = (userId: string) => {
+    socket.emit('unmute-user', { userId, roomId });
+  };
+
+  const handleMuteAll = () => {
+    socket.emit('mute-all', { roomId });
+  };
+
+  const handleKickUser = (userId: string) => {
+    socket.emit('kick-user', { userId, roomId });
+  };
+
   const toggleFullscreen = (id: string) => setFullscreenUserId(prev => (prev === id ? null : id));
 
   // Responsive grid class based on number of participants
@@ -304,6 +320,11 @@ export function RoomPage({
                 onClose={() => setShowChat(false)}
                 onPlaySound={sound}
                 isRoomPage
+                isAdmin={isAdmin}
+                onMuteUser={handleMuteUser}
+                onUnmuteUser={handleUnmuteUser}
+                onMuteAll={handleMuteAll}
+                onKickUser={handleKickUser}
               />
             </motion.div>
           )}
@@ -424,6 +445,11 @@ export function RoomPage({
           onJoinRoom={() => {}}
           onPlaySound={sound}
           isRoomPage
+          isAdmin={isAdmin}
+          onMuteUser={handleMuteUser}
+          onUnmuteUser={handleUnmuteUser}
+          onMuteAll={handleMuteAll}
+          onKickUser={handleKickUser}
         />
       </aside>
 

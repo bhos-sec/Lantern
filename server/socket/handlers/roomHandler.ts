@@ -5,7 +5,7 @@ import { broadcastPresence } from '../../services/presenceService';
 import { handleLeaveRoom } from '../../services/roomService';
 import { checkCooldown } from '../../lib/rateLimiter.js';
 import { JOIN_COOLDOWN_MS } from '../../config.js';
-import type { JoinRoomPayload } from '@shared/types';
+import type { JoinRoomPayload, MuteUserPayload, UnmuteUserPayload, MuteAllPayload, KickUserPayload } from '@shared/types';
 
 /** Handles room lifecycle: create, join, leave, privacy toggling, and cleanup on disconnect. */
 export function registerRoomHandlers(socket: Socket, io: Server): void {
@@ -80,6 +80,69 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
 
     roomRepository.update(user.roomId, { isPrivate });
     broadcastPresence(io);
+  });
+
+  // ── Host Controls (Issue #10) ──────────────────────────────────────────────────
+  socket.on('mute-user', ({ roomId, targetUserId }: MuteUserPayload) => {
+    const admin = userRepository.get(socket.id);
+    if (!admin?.roomId || admin.roomId !== roomId) return;
+
+    const meta = roomRepository.get(roomId);
+    if (meta?.adminId !== socket.id) return; // Only admins can mute
+
+    const targetUser = userRepository.get(targetUserId);
+    if (!targetUser || targetUser.roomId !== roomId) return;
+
+    userRepository.update(targetUserId, { isMuted: true });
+    io.to(targetUserId).emit('force-muted', { reason: 'Admin muted your microphone' });
+    broadcastPresence(io);
+  });
+
+  socket.on('unmute-user', ({ roomId, targetUserId }: UnmuteUserPayload) => {
+    const admin = userRepository.get(socket.id);
+    if (!admin?.roomId || admin.roomId !== roomId) return;
+
+    const meta = roomRepository.get(roomId);
+    if (meta?.adminId !== socket.id) return; // Only admins can unmute
+
+    const targetUser = userRepository.get(targetUserId);
+    if (!targetUser || targetUser.roomId !== roomId) return;
+
+    userRepository.update(targetUserId, { isMuted: false });
+    io.to(targetUserId).emit('force-unmuted', { reason: 'Admin unmuted your microphone' });
+    broadcastPresence(io);
+  });
+
+  socket.on('mute-all', ({ roomId }: MuteAllPayload) => {
+    const admin = userRepository.get(socket.id);
+    if (!admin?.roomId || admin.roomId !== roomId) return;
+
+    const meta = roomRepository.get(roomId);
+    if (meta?.adminId !== socket.id) return; // Only admins can mute all
+
+    // Mute all participants except the admin
+    userRepository.entries().forEach(([userId, user]) => {
+      if (user.roomId === roomId && userId !== socket.id) {
+        userRepository.update(userId, { isMuted: true });
+        io.to(userId).emit('force-muted', { reason: 'Admin muted all participants' });
+      }
+    });
+    broadcastPresence(io);
+  });
+
+  socket.on('kick-user', ({ roomId, targetUserId }: KickUserPayload) => {
+    const admin = userRepository.get(socket.id);
+    if (!admin?.roomId || admin.roomId !== roomId) return;
+
+    const meta = roomRepository.get(roomId);
+    if (meta?.adminId !== socket.id) return; // Only admins can kick
+
+    const targetSocket = io.sockets.sockets.get(targetUserId);
+    if (!targetSocket) return;
+
+    io.to(targetUserId).emit('kicked', { reason: 'You were removed by the host' });
+    handleLeaveRoom(targetSocket, io, roomId);
+    targetSocket.disconnect(true);
   });
 
   // Clean up when the socket disconnects without explicitly leaving

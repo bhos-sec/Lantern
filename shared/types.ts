@@ -28,6 +28,8 @@ export interface PresenceUser {
   actualRoomId: string | null;
   isAdmin: boolean;
   isRoomPrivate: boolean;
+  /** Whether the user has been force-muted by the room admin */
+  isMuted?: boolean;
 }
 
 // ─── Socket Event Payloads (Client → Server) ─────────────────────────────────
@@ -89,6 +91,41 @@ export interface IncomingAnswerPayload {
 export interface IncomingIceCandidatePayload {
   from: string;
   candidate: RTCIceCandidateInit;
+}
+
+// ─── Host Controls (Issue #10) ──────────────────────────────────────────────
+
+/** Client → Server: mute a participant's microphone. */
+export interface MuteUserPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Client → Server: unmute a participant's microphone. */
+export interface UnmuteUserPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Client → Server: mute all participants in the room (host only). */
+export interface MuteAllPayload {
+  roomId: string;
+}
+
+/** Client → Server: remove a participant from the room. */
+export interface KickUserPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Server → Client: broadcast to a user that they were muted by the host. */
+export interface ForceMutedPayload {
+  reason?: string;
+}
+
+/** Server → Client: broadcast to a user that they were kicked by the host. */
+export interface KickedPayload {
+  reason?: string;
 }
 
 // ─── Meeting Engagement Tools (Issue #9) ────────────────────────────────────

@@ -19,6 +19,7 @@ export function broadcastPresence(io: Server): void {
       actualRoomId: data.roomId,
       isAdmin: meta ? meta.adminId === id : false,
       isRoomPrivate: meta ? meta.isPrivate : false,
+      isMuted: data.isMuted ?? false,
     };
   });
 

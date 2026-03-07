@@ -5,6 +5,7 @@ export interface UserRecord {
   name: string;
   roomId: string | null;
   showRoom: boolean;
+  isMuted?: boolean; // Force-muted by the room admin
 }
 
 const store = new Map<string, UserRecord>();
