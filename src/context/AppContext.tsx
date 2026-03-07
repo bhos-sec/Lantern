@@ -11,7 +11,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import { playSound } from '../lib/sounds';
 import type { PresenceUser, RateLimitedPayload } from '@shared/types';
 
-export type AppStep = 'name' | 'lobby' | 'room';
+export type AppStep = 'name' | 'lobby' | 'pre-join' | 'room';
 
 interface AppContextValue {
   // Navigation
@@ -39,6 +39,20 @@ interface AppContextValue {
   error: string | null;
   setError: (msg: string | null) => void;
 
+  // ── Pre-join pending room ───────────────────────────────────────────────
+  /** The room ID the user intends to join — set before entering pre-join screen. */
+  pendingRoomId: string | null;
+  setPendingRoomId: (id: string | null) => void;
+  /** The room password (if any) for the pending join. */
+  pendingRoomPassword: string | undefined;
+  setPendingRoomPassword: (pw: string | undefined) => void;
+  /** Whether the pending room is being created (true) or joined (false). */
+  pendingIsCreating: boolean;
+  setPendingIsCreating: (v: boolean) => void;
+  /** Whether the pending room should be private. */
+  pendingIsPrivate: boolean;
+  setPendingIsPrivate: (v: boolean) => void;
+
   // ── Single-session enforcement ──────────────────────────────────────────
   /** True when the server detected a duplicate session from the same device. */
   isDuplicateSession: boolean;
@@ -58,6 +72,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [isDuplicateSession, setIsDuplicateSession] = useState(false);
   const [isSessionTakenOver, setIsSessionTakenOver] = useState(false);
+
+  // Pre-join pending room state
+  const [pendingRoomId, setPendingRoomId] = useState<string | null>(null);
+  const [pendingRoomPassword, setPendingRoomPassword] = useState<string | undefined>(undefined);
+  const [pendingIsCreating, setPendingIsCreating] = useState(false);
+  const [pendingIsPrivate, setPendingIsPrivate] = useState(false);
 
   const { notifications, addNotification } = useNotifications();
 
@@ -141,6 +161,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addNotification,
     error,
     setError,
+    pendingRoomId,
+    setPendingRoomId,
+    pendingRoomPassword,
+    setPendingRoomPassword,
+    pendingIsCreating,
+    setPendingIsCreating,
+    pendingIsPrivate,
+    setPendingIsPrivate,
     isDuplicateSession,
     isSessionTakenOver,
     takeOverSession,
