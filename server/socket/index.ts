@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
-import { registerUserHandlers } from "./handlers/userHandler.js";
-import { registerRoomHandlers } from "./handlers/roomHandler.js";
-import { registerChatHandlers } from "./handlers/chatHandler.js";
-import { registerWebRTCHandlers } from "./handlers/webrtcHandler.js";
+import { registerUserHandlers } from "./handlers/userHandler";
+import { registerRoomHandlers } from "./handlers/roomHandler";
+import { registerChatHandlers } from "./handlers/chatHandler";
+import { registerWebRTCHandlers } from "./handlers/webrtcHandler";
 
 /** Attach all domain-scoped event handlers to every new socket connection. */
 export function initSocketHandlers(io: Server): void {
