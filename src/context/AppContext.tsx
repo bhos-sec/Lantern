@@ -38,6 +38,14 @@ interface AppContextValue {
   // Error banner
   error: string | null;
   setError: (msg: string | null) => void;
+
+  // ── Single-session enforcement ──────────────────────────────────────────
+  /** True when the server detected a duplicate session from the same device. */
+  isDuplicateSession: boolean;
+  /** True when another tab claimed this device's session via "Use This Tab". */
+  isSessionTakenOver: boolean;
+  /** Emit "take-over-session" to claim the current tab as the active session. */
+  takeOverSession: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -48,6 +56,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [onlineUsers, setOnlineUsers] = useState<PresenceUser[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDuplicateSession, setIsDuplicateSession] = useState(false);
+  const [isSessionTakenOver, setIsSessionTakenOver] = useState(false);
 
   const { notifications, addNotification } = useNotifications();
 
@@ -79,12 +89,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addNotification(msg, "error");
     });
 
+    // ── Device-session events ─────────────────────────────────────────────
+    // Server tells this tab it's a duplicate (another tab is already active).
+    socket.on("duplicate-session", () => {
+      setIsDuplicateSession(true);
+    });
+
+    // Server tells this tab its session was claimed by a newer tab.
+    socket.on("session-taken-over", () => {
+      setIsSessionTakenOver(true);
+    });
+
+    // Server grants the take-over — clear the blocked state and resume.
+    socket.on("take-over-granted", () => {
+      setIsDuplicateSession(false);
+    });
+
     return () => {
       socket.off("presence-update", setOnlineUsers);
       socket.off("name-set-success");
       socket.off("error");
+      socket.off("duplicate-session");
+      socket.off("session-taken-over");
+      socket.off("take-over-granted");
     };
   }, [sound, addNotification]);
+
+  /** Ask the server to evict the existing session and grant this tab. */
+  const takeOverSession = useCallback(() => {
+    socket.emit("take-over-session");
+  }, []);
 
   const value: AppContextValue = {
     step,
@@ -100,6 +134,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addNotification,
     error,
     setError,
+    isDuplicateSession,
+    isSessionTakenOver,
+    takeOverSession,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

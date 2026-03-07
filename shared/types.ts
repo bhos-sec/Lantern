@@ -90,3 +90,26 @@ export interface IncomingIceCandidatePayload {
   from: string;
   candidate: RTCIceCandidateInit;
 }
+
+// ─── Device Session Events (Server → Client) ──────────────────────────────────
+
+/**
+ * Emitted to a socket when the server detects that another socket from the
+ * same physical device is already connected (production-only check).
+ * The client should render the DuplicateSessionPage and optionally let the
+ * user emit "take-over-session" to claim this tab.
+ */
+export type DuplicateSessionEvent = "duplicate-session";
+
+/**
+ * Emitted to the *old* tab when a newer tab from the same device exercises
+ * the "Use This Tab" / take-over action.  The old tab should render a
+ * "session moved" screen and stop interacting with the server.
+ */
+export type SessionTakenOverEvent = "session-taken-over";
+
+/**
+ * Emitted back to the *new* tab after the server grants the take-over.
+ * The client clears the duplicate-session state and proceeds normally.
+ */
+export type TakeOverGrantedEvent = "take-over-granted";
