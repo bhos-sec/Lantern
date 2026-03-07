@@ -10,7 +10,14 @@ interface VideoPlayerProps {
   onToggleFullscreen?: () => void;
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLocal, isMuted, isFullscreen, onToggleFullscreen }) => {
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  stream,
+  userName,
+  isLocal,
+  isMuted,
+  isFullscreen,
+  onToggleFullscreen,
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -33,7 +40,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
 
   useEffect(() => {
     if (!stream || stream.getAudioTracks().length === 0) return;
-    
+
     let audioContext: AudioContext;
     let analyser: AnalyserNode;
     let microphone: MediaStreamAudioSourceNode;
@@ -59,18 +66,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
 
         const length = array.length;
         for (let i = 0; i < length; i++) {
-          values += (array[i]);
+          values += array[i];
         }
 
         const average = values / length;
-        if (average > 15) { // Threshold for speaking
+        if (average > 15) {
+          // Threshold for speaking
           setIsSpeaking(true);
         } else {
           setIsSpeaking(false);
         }
       };
     } catch (e) {
-      console.error("AudioContext error", e);
+      console.error('AudioContext error', e);
     }
 
     return () => {
@@ -104,7 +112,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
     if (!isDragging || !isFullscreen || zoom <= 1) return;
     setPan({
       x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
+      y: e.clientY - dragStart.y,
     });
   };
 
@@ -127,7 +135,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
   };
 
   return (
-    <div 
+    <div
       className={`relative group bg-zinc-900 rounded-2xl overflow-hidden border shadow-2xl transition-all duration-300 ${
         isFullscreen ? 'fixed inset-4 z-50' : 'aspect-video'
       } ${isSpeaking ? 'border-emerald-500 shadow-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'border-white/5'}`}
@@ -146,19 +154,25 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
         style={{
           transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
           cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
-          transition: isDragging ? 'none' : 'transform 0.2s ease-out'
+          transition: isDragging ? 'none' : 'transform 0.2s ease-out',
         }}
       />
       <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
-        <div className={isLocal ? "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" : "w-2 h-2 rounded-full bg-blue-500"} />
+        <div
+          className={
+            isLocal
+              ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse'
+              : 'w-2 h-2 rounded-full bg-blue-500'
+          }
+        />
         <span className="text-xs font-medium text-white">
-          {userName} {isLocal && "(You)"}
+          {userName} {isLocal && '(You)'}
         </span>
       </div>
-      
+
       {isFullscreen && (
         <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button 
+          <button
             onClick={handleZoomOut}
             disabled={zoom <= 1}
             className="p-1.5 text-white hover:bg-white/20 rounded-md disabled:opacity-50 disabled:hover:bg-transparent"
@@ -169,7 +183,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
           <span className="text-xs font-medium text-white w-12 text-center">
             {Math.round(zoom * 100)}%
           </span>
-          <button 
+          <button
             onClick={handleZoomIn}
             disabled={zoom >= 5}
             className="p-1.5 text-white hover:bg-white/20 rounded-md disabled:opacity-50 disabled:hover:bg-transparent"
@@ -181,7 +195,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, userName, isLo
       )}
 
       {onToggleFullscreen && (
-        <button 
+        <button
           onClick={onToggleFullscreen}
           className="absolute top-4 right-4 p-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity text-white hover:bg-black/60"
         >

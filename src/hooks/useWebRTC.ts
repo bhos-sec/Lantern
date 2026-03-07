@@ -1,12 +1,12 @@
-import { useRef, useState, useEffect } from "react";
-import { Socket } from "socket.io-client";
-import { ICE_SERVERS } from "../lib/constants";
+import { useRef, useState, useEffect } from 'react';
+import { Socket } from 'socket.io-client';
+import { ICE_SERVERS } from '../lib/constants';
 import type {
   UserJoinedPayload,
   IncomingOfferPayload,
   IncomingAnswerPayload,
   IncomingIceCandidatePayload,
-} from "@shared/types";
+} from '@shared/types';
 
 export interface RemoteStream {
   stream: MediaStream;
@@ -34,14 +34,14 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
     peersRef.current[userId] = pc;
 
     // Add all local tracks so the remote peer can receive them
-    localStream?.getTracks().forEach((track) => pc.addTrack(track, localStream));
+    localStream?.getTracks().forEach(track => pc.addTrack(track, localStream));
 
     pc.onicecandidate = ({ candidate }) => {
-      if (candidate) socket.emit("ice-candidate", { to: userId, candidate });
+      if (candidate) socket.emit('ice-candidate', { to: userId, candidate });
     };
 
     pc.ontrack = ({ streams }) => {
-      setRemoteStreams((prev) => ({
+      setRemoteStreams(prev => ({
         ...prev,
         [userId]: { stream: streams[0], name: remoteUserName },
       }));
@@ -61,7 +61,7 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
       const pc = createPeerConnection(userId, joinedName);
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      socket.emit("offer", { to: userId, offer, fromName: userName });
+      socket.emit('offer', { to: userId, offer, fromName: userName });
     };
 
     const handleOffer = async ({ from, offer, fromName }: IncomingOfferPayload) => {
@@ -69,7 +69,7 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      socket.emit("answer", { to: from, answer });
+      socket.emit('answer', { to: from, answer });
     };
 
     const handleAnswer = async ({ from, answer }: IncomingAnswerPayload) => {
@@ -85,25 +85,25 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
     const handleUserLeft = (userId: string) => {
       peersRef.current[userId]?.close();
       delete peersRef.current[userId];
-      setRemoteStreams((prev) => {
+      setRemoteStreams(prev => {
         const next = { ...prev };
         delete next[userId];
         return next;
       });
     };
 
-    socket.on("user-joined", handleUserJoined);
-    socket.on("offer", handleOffer);
-    socket.on("answer", handleAnswer);
-    socket.on("ice-candidate", handleIceCandidate);
-    socket.on("user-left", handleUserLeft);
+    socket.on('user-joined', handleUserJoined);
+    socket.on('offer', handleOffer);
+    socket.on('answer', handleAnswer);
+    socket.on('ice-candidate', handleIceCandidate);
+    socket.on('user-left', handleUserLeft);
 
     return () => {
-      socket.off("user-joined", handleUserJoined);
-      socket.off("offer", handleOffer);
-      socket.off("answer", handleAnswer);
-      socket.off("ice-candidate", handleIceCandidate);
-      socket.off("user-left", handleUserLeft);
+      socket.off('user-joined', handleUserJoined);
+      socket.off('offer', handleOffer);
+      socket.off('answer', handleAnswer);
+      socket.off('ice-candidate', handleIceCandidate);
+      socket.off('user-left', handleUserLeft);
     };
   }, [socket, localStream, userName]);
 

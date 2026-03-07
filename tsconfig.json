@@ -4,11 +4,7 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
@@ -17,8 +13,7 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./*"],
-      "@shared/*": ["./shared/*"
-      ]
+      "@shared/*": ["./shared/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true

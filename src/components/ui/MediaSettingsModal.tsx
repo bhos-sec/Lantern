@@ -1,7 +1,7 @@
-import React from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { Settings, X, Video, VideoOff, Mic, MicOff } from "lucide-react";
-import { cn } from "../../lib/utils";
+import React from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Settings, X, Video, VideoOff, Mic, MicOff } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface Props {
   open: boolean;
@@ -66,11 +66,11 @@ export function MediaSettingsModal({
                   </label>
                   <select
                     value={selectedVideoDevice}
-                    onChange={(e) => onVideoDeviceChange(e.target.value)}
+                    onChange={e => onVideoDeviceChange(e.target.value)}
                     className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     <option value="">Default Camera</option>
-                    {videoDevices.map((d) => (
+                    {videoDevices.map(d => (
                       <option key={d.deviceId} value={d.deviceId}>
                         {d.label || `Camera ${d.deviceId.slice(0, 5)}`}
                       </option>
@@ -84,11 +84,11 @@ export function MediaSettingsModal({
                   </label>
                   <select
                     value={selectedAudioDevice}
-                    onChange={(e) => onAudioDeviceChange(e.target.value)}
+                    onChange={e => onAudioDeviceChange(e.target.value)}
                     className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     <option value="">Default Microphone</option>
-                    {audioDevices.map((d) => (
+                    {audioDevices.map(d => (
                       <option key={d.deviceId} value={d.deviceId}>
                         {d.label || `Microphone ${d.deviceId.slice(0, 5)}`}
                       </option>
@@ -106,26 +106,26 @@ export function MediaSettingsModal({
                   <button
                     onClick={() => onStartVideoOffChange(!startVideoOff)}
                     className={cn(
-                      "flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium",
+                      'flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium',
                       startVideoOff
-                        ? "bg-red-500/10 border-red-500/50 text-red-500"
-                        : "bg-zinc-800 border-white/5 text-zinc-300"
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                        : 'bg-zinc-800 border-white/5 text-zinc-300',
                     )}
                   >
                     {startVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
-                    Video {startVideoOff ? "Off" : "On"}
+                    Video {startVideoOff ? 'Off' : 'On'}
                   </button>
                   <button
                     onClick={() => onStartMutedChange(!startMuted)}
                     className={cn(
-                      "flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium",
+                      'flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium',
                       startMuted
-                        ? "bg-red-500/10 border-red-500/50 text-red-500"
-                        : "bg-zinc-800 border-white/5 text-zinc-300"
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500'
+                        : 'bg-zinc-800 border-white/5 text-zinc-300',
                     )}
                   >
                     {startMuted ? <MicOff size={18} /> : <Mic size={18} />}
-                    Mic {startMuted ? "Off" : "On"}
+                    Mic {startMuted ? 'Off' : 'On'}
                   </button>
                 </div>
               </div>

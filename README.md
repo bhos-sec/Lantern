@@ -20,16 +20,16 @@ A private, real-time media sharing and video conferencing platform built on a pe
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, TypeScript, Vite 6 |
-| Styling | Tailwind CSS v4, `motion` (Framer Motion v12) |
-| Icons | Lucide React |
-| Real-time | Socket.IO v4 (client + server) |
-| Video / Audio | WebRTC (browser-native, P2P mesh) |
-| Backend | Node.js, Express 4 |
-| Dev server | `tsx` (no compile step in development) |
-| PWA | `vite-plugin-pwa` |
+| Layer         | Technology                                    |
+| ------------- | --------------------------------------------- |
+| Frontend      | React 19, TypeScript, Vite 6                  |
+| Styling       | Tailwind CSS v4, `motion` (Framer Motion v12) |
+| Icons         | Lucide React                                  |
+| Real-time     | Socket.IO v4 (client + server)                |
+| Video / Audio | WebRTC (browser-native, P2P mesh)             |
+| Backend       | Node.js, Express 4                            |
+| Dev server    | `tsx` (no compile step in development)        |
+| PWA           | `vite-plugin-pwa`                             |
 
 ---
 
@@ -110,10 +110,10 @@ Copy the example file and fill in your values:
 cp .env.example .env.local
 ```
 
-| Variable | Required | Description |
-|---|---|---|
-| `GEMINI_API_KEY` | No | Google Gemini key (reserved for future AI features) |
-| `PORT` | No | Server port — defaults to `3000` |
+| Variable         | Required | Description                                         |
+| ---------------- | -------- | --------------------------------------------------- |
+| `GEMINI_API_KEY` | No       | Google Gemini key (reserved for future AI features) |
+| `PORT`           | No       | Server port — defaults to `3000`                    |
 
 ### Development
 
@@ -166,14 +166,14 @@ Browser A                    Server                    Browser B
 
 ## Tips & Shortcuts
 
-| Action | How |
-|---|---|
-| Fullscreen a video tile | Click the expand icon (hover to reveal) |
-| Zoom / pan in fullscreen | Scroll wheel to zoom, drag to pan |
-| Send a private message | Click the DM icon next to a user in the Room or All tab |
-| Mute yourself | `Mic` button in footer |
-| Turn off camera | `Video` button in footer |
-| Share your screen | `Share` button in footer |
+| Action                   | How                                                     |
+| ------------------------ | ------------------------------------------------------- |
+| Fullscreen a video tile  | Click the expand icon (hover to reveal)                 |
+| Zoom / pan in fullscreen | Scroll wheel to zoom, drag to pan                       |
+| Send a private message   | Click the DM icon next to a user in the Room or All tab |
+| Mute yourself            | `Mic` button in footer                                  |
+| Turn off camera          | `Video` button in footer                                |
+| Share your screen        | `Share` button in footer                                |
 
 ---
 
@@ -196,9 +196,9 @@ All state lives in two in-memory Maps. Swap them for a SQLite (or other DB) adap
 
 ## Branch Strategy
 
-| Branch | Description |
-|---|---|
-| `main` | Stable baseline |
+| Branch                               | Description                    |
+| ------------------------------------ | ------------------------------ |
+| `main`                               | Stable baseline                |
 | `refactor/separate-backend-frontend` | Layered architecture (current) |
 
 ---
