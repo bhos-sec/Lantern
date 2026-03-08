@@ -15,6 +15,7 @@ export const SOCKET_MESSAGE = {
   LEAVE_ROOM: 'leave-room',
   ROOM_CLOSED: 'room-closed',
   TOGGLE_ROOM_PRIVACY: 'toggle-room-privacy',
+  TOGGLE_ROOM_VISIBILITY: 'toggle-room-visibility',
   USER_JOINED: 'user-joined',
   USER_LEFT: 'user-left',
 
@@ -33,6 +34,9 @@ export const SOCKET_MESSAGE = {
   SESSION_TAKEN_OVER: 'session-taken-over',
   TAKE_OVER_SESSION: 'take-over-session',
   TAKE_OVER_GRANTED: 'take-over-granted',
+
+  // Socket.io built-in events
+  DISCONNECT: 'disconnect',
 
   // Error event
   ERROR: 'error',

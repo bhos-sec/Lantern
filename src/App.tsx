@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { MonitorX } from 'lucide-react';
 import { socket } from './lib/socket';
+import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import { useAppContext } from './context/AppContext';
 import { useMedia } from './hooks/useMedia';
 import { useWebRTC } from './hooks/useWebRTC';
@@ -60,9 +61,9 @@ export default function App() {
       addMessage(msg);
       if (msg.senderId !== socket.id) sound('message');
     };
-    socket.on('receive-message', handleMessage);
+    socket.on(SOCKET_MESSAGE.RECEIVE_MESSAGE, handleMessage);
     return () => {
-      socket.off('receive-message', handleMessage);
+      socket.off(SOCKET_MESSAGE.RECEIVE_MESSAGE, handleMessage);
     };
   }, [addMessage, sound]);
 
@@ -80,9 +81,9 @@ export default function App() {
         _ = video; // already set inside acquireMedia
       }
     };
-    socket.on('join-room-success', handleJoinSuccess);
+    socket.on(SOCKET_MESSAGE.JOIN_ROOM_SUCCESS, handleJoinSuccess);
     return () => {
-      socket.off('join-room-success', handleJoinSuccess);
+      socket.off(SOCKET_MESSAGE.JOIN_ROOM_SUCCESS, handleJoinSuccess);
     };
   }, [media.localStream, setStep]);
 
@@ -92,9 +93,9 @@ export default function App() {
       leaveRoom();
       addNotification('The room was closed by the admin.', 'info');
     };
-    socket.on('room-closed', handleRoomClosed);
+    socket.on(SOCKET_MESSAGE.ROOM_CLOSED, handleRoomClosed);
     return () => {
-      socket.off('room-closed', handleRoomClosed);
+      socket.off(SOCKET_MESSAGE.ROOM_CLOSED, handleRoomClosed);
     };
   }, []);
 
@@ -104,7 +105,7 @@ export default function App() {
       if (!idToJoin || !userName) return;
       const stream = await media.acquireMedia();
       if (!stream) return; // Permission denied — acquireMedia shows the alert
-      socket.emit('join-room', {
+      socket.emit(SOCKET_MESSAGE.JOIN_ROOM, {
         roomId: idToJoin,
         userName,
         password,
@@ -121,13 +122,13 @@ export default function App() {
     media.stopAllTracks();
     closeAllPeers();
     clearMessages();
-    socket.emit('leave-room', roomId);
+    socket.emit(SOCKET_MESSAGE.LEAVE_ROOM, roomId);
     setStep('lobby');
   }, [media, closeAllPeers, clearMessages, roomId, sound, setStep]);
 
   const toggleRoomPrivacy = (isPrivate: boolean) => {
     sound('click');
-    socket.emit('toggle-room-privacy', isPrivate);
+    socket.emit(SOCKET_MESSAGE.TOGGLE_ROOM_PRIVACY, isPrivate);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────

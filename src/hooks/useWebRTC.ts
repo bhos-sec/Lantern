@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { ICE_SERVERS } from '../lib/constants';
+import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import type {
   UserJoinedPayload,
   IncomingOfferPayload,
@@ -37,7 +38,7 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
     localStream?.getTracks().forEach(track => pc.addTrack(track, localStream));
 
     pc.onicecandidate = ({ candidate }) => {
-      if (candidate) socket.emit('ice-candidate', { to: userId, candidate });
+      if (candidate) socket.emit(SOCKET_MESSAGE.ICE_CANDIDATE, { to: userId, candidate });
     };
 
     pc.ontrack = ({ streams }) => {
@@ -61,7 +62,7 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
       const pc = createPeerConnection(userId, joinedName);
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      socket.emit('offer', { to: userId, offer, fromName: userName });
+      socket.emit(SOCKET_MESSAGE.OFFER, { to: userId, offer, fromName: userName });
     };
 
     const handleOffer = async ({ from, offer, fromName }: IncomingOfferPayload) => {
@@ -69,7 +70,7 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      socket.emit('answer', { to: from, answer });
+      socket.emit(SOCKET_MESSAGE.ANSWER, { to: from, answer });
     };
 
     const handleAnswer = async ({ from, answer }: IncomingAnswerPayload) => {
@@ -92,18 +93,18 @@ export function useWebRTC({ socket, localStream, userName }: UseWebRTCProps) {
       });
     };
 
-    socket.on('user-joined', handleUserJoined);
-    socket.on('offer', handleOffer);
-    socket.on('answer', handleAnswer);
-    socket.on('ice-candidate', handleIceCandidate);
-    socket.on('user-left', handleUserLeft);
+    socket.on(SOCKET_MESSAGE.USER_JOINED, handleUserJoined);
+    socket.on(SOCKET_MESSAGE.OFFER, handleOffer);
+    socket.on(SOCKET_MESSAGE.ANSWER, handleAnswer);
+    socket.on(SOCKET_MESSAGE.ICE_CANDIDATE, handleIceCandidate);
+    socket.on(SOCKET_MESSAGE.USER_LEFT, handleUserLeft);
 
     return () => {
-      socket.off('user-joined', handleUserJoined);
-      socket.off('offer', handleOffer);
-      socket.off('answer', handleAnswer);
-      socket.off('ice-candidate', handleIceCandidate);
-      socket.off('user-left', handleUserLeft);
+      socket.off(SOCKET_MESSAGE.USER_JOINED, handleUserJoined);
+      socket.off(SOCKET_MESSAGE.OFFER, handleOffer);
+      socket.off(SOCKET_MESSAGE.ANSWER, handleAnswer);
+      socket.off(SOCKET_MESSAGE.ICE_CANDIDATE, handleIceCandidate);
+      socket.off(SOCKET_MESSAGE.USER_LEFT, handleUserLeft);
     };
   }, [socket, localStream, userName]);
 
