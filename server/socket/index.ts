@@ -75,6 +75,8 @@ export function initSocketHandlers(io: Server): void {
       if (deviceId) {
         deviceSessionRepository.unregisterBySocket(socket.id);
       }
+      // Release any rate-limiter state held for this socket
+      clearLimiter(socket.id);
     });
   });
 }

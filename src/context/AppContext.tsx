@@ -10,7 +10,7 @@ import { socket } from '../lib/socket';
 import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import { useNotifications } from '../hooks/useNotifications';
 import { playSound } from '../lib/sounds';
-import type { PresenceUser } from '@shared/types';
+import type { PresenceUser, RateLimitedPayload } from '@shared/types';
 
 export type AppStep = 'name' | 'lobby' | 'room';
 
@@ -88,6 +88,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     socket.on(SOCKET_MESSAGE.ERROR, (msg: string) => {
       setError(msg);
       addNotification(msg, 'error');
+    });
+
+    // ── Rate-limit feedback ───────────────────────────────────────────────
+    socket.on('rate-limited', ({ message }: RateLimitedPayload) => {
+      setError(message);
+      addNotification(message, 'error');
     });
 
     // ── Device-session events ─────────────────────────────────────────────
