@@ -6,8 +6,9 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Light mode is the default; dark mode overrides via the .dark class */
 body {
-  @apply bg-zinc-950 text-zinc-100 font-sans antialiased;
+  @apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans antialiased;
 }
 
 @layer utilities {
@@ -18,10 +19,18 @@ body {
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #27272a;
+    background: #d4d4d8;
     border-radius: 10px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
+    background: #a1a1aa;
   }
+}
+
+/* Dark-mode scrollbar overrides (outside @layer to ensure specificity) */
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }

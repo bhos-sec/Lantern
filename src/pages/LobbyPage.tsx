@@ -42,7 +42,7 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
   };
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-zinc-950 p-6">
+    <div className="min-h-dvh flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -171,8 +171,10 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                       }}
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-zinc-200">Private Room</span>
-                      <span className="text-[10px] text-zinc-500">
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                        Private Room
+                      </span>
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                         Don't show to others in lobby
                       </span>
                     </div>
@@ -199,8 +201,8 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
           </div>
 
           {/* Rooms / People tabs */}
-          <div className="lg:col-span-2 bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-8 rounded-3xl shadow-2xl flex flex-col">
-            <div className="flex items-center gap-1 bg-zinc-800/50 p-1 rounded-2xl mb-6">
+          <div className="lg:col-span-2 bg-white dark:bg-zinc-900/50 backdrop-blur-xl border border-zinc-200 dark:border-white/5 p-8 rounded-3xl shadow-lg dark:shadow-2xl flex flex-col">
+            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/50 p-1 rounded-2xl mb-6">
               <button
                 onClick={() => {
                   sound('click');
@@ -244,7 +246,7 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                     className="grid grid-cols-1 md:grid-cols-2 gap-3"
                   >
                     {activeRooms.length === 0 ? (
-                      <div className="col-span-full h-48 flex flex-col items-center justify-center text-zinc-600 border-2 border-dashed border-white/5 rounded-2xl">
+                      <div className="col-span-full h-48 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 border-2 border-dashed border-zinc-200 dark:border-white/5 rounded-2xl">
                         <Hash size={40} className="mb-3 opacity-20" />
                         <p className="text-sm">No public rooms active</p>
                       </div>
@@ -252,7 +254,7 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                       activeRooms.map(room => (
                         <div
                           key={room}
-                          className="flex items-center justify-between p-4 bg-zinc-800/50 border border-white/5 rounded-2xl group"
+                          className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-white/5 rounded-2xl group"
                         >
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-emerald-500/10 rounded-lg">
@@ -294,15 +296,17 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                         .map(user => (
                           <div
                             key={user.id}
-                            className="flex items-center justify-between p-4 bg-zinc-800/50 border border-white/5 rounded-2xl"
+                            className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-white/5 rounded-2xl"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-zinc-700 rounded-full flex items-center justify-center text-zinc-400 font-bold">
+                              <div className="w-10 h-10 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 font-bold">
                                 {user.name.charAt(0).toUpperCase()}
                               </div>
                               <div className="flex flex-col">
-                                <span className="font-medium text-zinc-200">{user.name}</span>
-                                <span className="text-[10px] text-zinc-500">
+                                <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                                  {user.name}
+                                </span>
+                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                                   {user.roomId
                                     ? `In: ${user.roomId}`
                                     : user.actualRoomId
@@ -332,18 +336,18 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
         </div>
 
         {/* Footer badge row */}
-        <div className="p-4 bg-zinc-900/50 border border-white/5 rounded-2xl flex items-center justify-between">
+        <div className="p-4 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-zinc-500">
+            <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
               <Shield size={14} className="text-emerald-500" />
               <span>P2P Encryption</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-zinc-500">
+            <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
               <Zap size={14} className="text-emerald-500" />
               <span>Low Latency</span>
             </div>
           </div>
-          <p className="text-[11px] text-zinc-600 italic">
+          <p className="text-[11px] text-zinc-400 dark:text-zinc-600 italic">
             Lantern — serverless-style private media sharing
           </p>
         </div>

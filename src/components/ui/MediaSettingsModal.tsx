@@ -41,17 +41,17 @@ export function MediaSettingsModal({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+            className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl"
           >
             {/* Header */}
-            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+            <div className="p-6 border-b border-zinc-200 dark:border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Settings className="text-emerald-500" size={20} />
-                <h2 className="text-lg font-bold text-white">Media Settings</h2>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white">Media Settings</h2>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 text-zinc-500 hover:text-white transition-colors"
+                className="p-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
                 <X size={20} />
               </button>
@@ -61,7 +61,7 @@ export function MediaSettingsModal({
               {/* Device selectors */}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-1">
                     Camera
                   </label>
                   <select
@@ -79,7 +79,7 @@ export function MediaSettingsModal({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-1">
                     Microphone
                   </label>
                   <select
@@ -99,7 +99,7 @@ export function MediaSettingsModal({
 
               {/* Join preferences */}
               <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+                <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-1">
                   Join Preferences
                 </label>
                 <div className="grid grid-cols-2 gap-3">

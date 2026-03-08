@@ -72,16 +72,16 @@ export function RoomPage({
   );
 
   return (
-    <div className="h-screen flex flex-col md:flex-row bg-zinc-950 overflow-hidden">
+    <div className="h-screen flex flex-col md:flex-row bg-zinc-50 dark:bg-zinc-950 overflow-hidden">
       {/* ── Main Area ──────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Header */}
-        <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-white/5 bg-zinc-900/30 backdrop-blur-md z-20">
+        <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-zinc-200 dark:border-white/5 bg-white/80 dark:bg-zinc-900/30 backdrop-blur-md z-20">
           <div className="flex items-center gap-2 md:gap-4">
             {/* Room ID badge */}
-            <div className="flex items-center gap-2 px-3 py-1 bg-zinc-800 rounded-full border border-white/5">
+            <div className="flex items-center gap-2 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full border border-zinc-200 dark:border-white/5">
               <Hash size={14} className="text-emerald-500" />
-              <span className="text-xs md:text-sm font-semibold text-zinc-200 truncate max-w-[80px] md:max-w-none">
+              <span className="text-xs md:text-sm font-semibold text-zinc-700 dark:text-zinc-200 truncate max-w-[80px] md:max-w-none">
                 {roomId}
               </span>
             </div>
@@ -118,7 +118,7 @@ export function RoomPage({
               </div>
             )}
 
-            <div className="hidden sm:block h-4 w-px bg-white/10" />
+            <div className="hidden sm:block h-4 w-px bg-zinc-200 dark:bg-white/10" />
 
             <button
               onClick={() => {
@@ -147,10 +147,18 @@ export function RoomPage({
               <Settings size={16} />
             </button>
 
-            <div className="hidden sm:block h-4 w-px bg-white/10" />
+            <button
+              onClick={toggleTheme}
+              className="p-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg border border-zinc-200 dark:border-white/5 transition-all"
+              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+
+            <div className="hidden sm:block h-4 w-px bg-zinc-200 dark:bg-white/10" />
 
             {/* Participant count */}
-            <div className="flex items-center gap-2 text-zinc-400">
+            <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
               <Users size={16} />
               <span className="text-[10px] md:text-xs font-medium">
                 {Object.keys(remoteStreams).length + 1}
@@ -246,7 +254,7 @@ export function RoomPage({
         </AnimatePresence>
 
         {/* Footer Controls */}
-        <footer className="h-20 md:h-24 flex items-center justify-center px-4 md:px-6 border-t border-white/5 bg-zinc-900/30 backdrop-blur-md">
+        <footer className="h-20 md:h-24 flex items-center justify-center px-4 md:px-6 border-t border-zinc-200 dark:border-white/5 bg-white/80 dark:bg-zinc-900/30 backdrop-blur-md">
           <div className="flex items-center gap-2 md:gap-4">
             <button
               onClick={() => {
@@ -278,7 +286,7 @@ export function RoomPage({
               {media.isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
             </button>
 
-            <div className="w-px h-6 md:h-8 bg-white/10 mx-1 md:mx-2" />
+            <div className="w-px h-6 md:h-8 bg-zinc-200 dark:bg-white/10 mx-1 md:mx-2" />
 
             <button
               onClick={() => {

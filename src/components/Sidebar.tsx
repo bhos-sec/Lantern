@@ -44,9 +44,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const roomUsers = onlineUsers.filter(u => u.actualRoomId === currentRoomId);
 
   return (
-    <div className="flex flex-col h-full bg-zinc-900/95 backdrop-blur-2xl border-l border-white/5">
+    <div className="flex flex-col h-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl border-l border-zinc-200 dark:border-white/5">
       {/* Tabs Header */}
-      <div className="flex items-center border-b border-white/5 p-1">
+      <div className="flex items-center border-b border-zinc-200 dark:border-white/5 p-1">
         <button
           onClick={() => {
             onPlaySound?.('click');
@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Users size={14} />
           Room
-          <span className="bg-zinc-800 text-zinc-400 px-1 py-0.5 rounded text-[9px]">
+          <span className="bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 px-1 py-0.5 rounded text-[9px]">
             {roomUsers.length}
           </span>
         </button>
@@ -94,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Users size={14} />
           All
-          <span className="bg-zinc-800 text-zinc-400 px-1 py-0.5 rounded text-[9px]">
+          <span className="bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 px-1 py-0.5 rounded text-[9px]">
             {onlineUsers.length}
           </span>
         </button>
@@ -137,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
-              className="h-full flex flex-col p-4 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+              className="h-full flex flex-col p-4 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent"
             >
               <div className="space-y-1 mb-2">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">
@@ -147,14 +147,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {roomUsers.map(user => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-3 bg-zinc-800/30 border border-white/5 rounded-xl"
+                  className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200 dark:border-white/5 rounded-xl"
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center text-zinc-400 text-xs font-bold">
+                      <div className="w-8 h-8 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 text-xs font-bold">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-zinc-900 rounded-full" />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-zinc-900 rounded-full" />
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-zinc-200">
@@ -184,7 +184,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
-              className="h-full flex flex-col p-4 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+              className="h-full flex flex-col p-4 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent"
             >
               <div className="space-y-1 mb-2">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">
@@ -194,14 +194,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {onlineUsers.map(user => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-3 bg-zinc-800/30 border border-white/5 rounded-xl"
+                  className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200 dark:border-white/5 rounded-xl"
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center text-zinc-400 text-xs font-bold">
+                      <div className="w-8 h-8 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 text-xs font-bold">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-zinc-900 rounded-full" />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-zinc-900 rounded-full" />
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-zinc-200">
