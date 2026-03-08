@@ -2,7 +2,6 @@ import { Socket, Server } from 'socket.io';
 import type { SendMessagePayload, SendPrivateMessagePayload } from '@shared/types';
 import { SOCKET_MESSAGE } from '@shared/socketEvents';
 
-
 /** Handles room broadcast messages and private (DM) messages. */
 export function registerChatHandlers(socket: Socket, io: Server): void {
   socket.on(SOCKET_MESSAGE.SEND_MESSAGE, ({ roomId, message, userName }: SendMessagePayload) => {
