@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface MediaPreferences {
   selectedAudioDevice: string;
@@ -33,18 +33,21 @@ export function useMedia(): UseMediaReturn {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [selectedAudioDevice, setSelectedAudioDevice] = useState("");
-  const [selectedVideoDevice, setSelectedVideoDevice] = useState("");
+  const [selectedAudioDevice, setSelectedAudioDevice] = useState('');
+  const [selectedVideoDevice, setSelectedVideoDevice] = useState('');
   const [startMuted, setStartMuted] = useState(false);
   const [startVideoOff, setStartVideoOff] = useState(false);
 
   // Enumerate available devices once on mount
   useEffect(() => {
     if (!navigator.mediaDevices?.enumerateDevices) return;
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      setAudioDevices(devices.filter((d) => d.kind === "audioinput"));
-      setVideoDevices(devices.filter((d) => d.kind === "videoinput"));
-    }).catch(console.error);
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then(devices => {
+        setAudioDevices(devices.filter(d => d.kind === 'audioinput'));
+        setVideoDevices(devices.filter(d => d.kind === 'videoinput'));
+      })
+      .catch(console.error);
   }, []);
 
   /**
@@ -53,7 +56,7 @@ export function useMedia(): UseMediaReturn {
    */
   const acquireMedia = async (): Promise<MediaStream | null> => {
     if (!navigator.mediaDevices?.getUserMedia) {
-      console.error("Media devices are not available. Use HTTPS or localhost.");
+      console.error('Media devices are not available. Use HTTPS or localhost.');
       return null;
     }
 
@@ -75,15 +78,15 @@ export function useMedia(): UseMediaReturn {
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           setIsMuted(true);
         } catch {
-          console.error("Permission denied or no media devices found.");
+          console.error('Permission denied or no media devices found.');
           return null;
         }
       }
     }
 
     // Apply pre-join preferences
-    stream.getAudioTracks().forEach((t) => (t.enabled = !startMuted));
-    stream.getVideoTracks().forEach((t) => (t.enabled = !startVideoOff));
+    stream.getAudioTracks().forEach(t => (t.enabled = !startMuted));
+    stream.getVideoTracks().forEach(t => (t.enabled = !startVideoOff));
     setIsMuted(startMuted);
     setIsVideoOff(startVideoOff);
     setLocalStream(stream);
@@ -91,21 +94,21 @@ export function useMedia(): UseMediaReturn {
   };
 
   const stopAllTracks = () => {
-    localStream?.getTracks().forEach((t) => t.stop());
+    localStream?.getTracks().forEach(t => t.stop());
     setLocalStream(null);
     setIsScreenSharing(false);
   };
 
   const toggleMute = () => {
     if (!localStream) return;
-    localStream.getAudioTracks().forEach((t) => (t.enabled = !t.enabled));
-    setIsMuted((prev) => !prev);
+    localStream.getAudioTracks().forEach(t => (t.enabled = !t.enabled));
+    setIsMuted(prev => !prev);
   };
 
   const toggleVideo = () => {
     if (!localStream) return;
-    localStream.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
-    setIsVideoOff((prev) => !prev);
+    localStream.getVideoTracks().forEach(t => (t.enabled = !t.enabled));
+    setIsVideoOff(prev => !prev);
   };
 
   const toggleScreenShare = async (peers: Record<string, RTCPeerConnection>) => {
@@ -116,19 +119,21 @@ export function useMedia(): UseMediaReturn {
         const screenTrack = screenStream.getVideoTracks()[0];
 
         // Replace the video sender in every active peer connection
-        Object.values(peers).forEach((pc) => {
-          pc.getSenders().find((s) => s.track?.kind === "video")?.replaceTrack(screenTrack);
+        Object.values(peers).forEach(pc => {
+          pc.getSenders()
+            .find(s => s.track?.kind === 'video')
+            ?.replaceTrack(screenTrack);
         });
 
         screenTrack.onended = () => stopScreenShare(peers);
 
-        setLocalStream((prev) => {
+        setLocalStream(prev => {
           if (!prev) return screenStream;
           return new MediaStream([screenTrack, ...prev.getAudioTracks()]);
         });
         setIsScreenSharing(true);
       } catch (err) {
-        console.error("Screen share error:", err);
+        console.error('Screen share error:', err);
       }
     } else {
       stopScreenShare(peers);
@@ -141,18 +146,20 @@ export function useMedia(): UseMediaReturn {
       const camStream = await navigator.mediaDevices.getUserMedia({ video: true });
       const camTrack = camStream.getVideoTracks()[0];
 
-      Object.values(peers).forEach((pc) => {
-        pc.getSenders().find((s) => s.track?.kind === "video")?.replaceTrack(camTrack);
+      Object.values(peers).forEach(pc => {
+        pc.getSenders()
+          .find(s => s.track?.kind === 'video')
+          ?.replaceTrack(camTrack);
       });
 
-      setLocalStream((prev) => {
+      setLocalStream(prev => {
         if (!prev) return camStream;
-        prev.getVideoTracks().forEach((t) => t.stop());
+        prev.getVideoTracks().forEach(t => t.stop());
         return new MediaStream([camTrack, ...prev.getAudioTracks()]);
       });
       setIsScreenSharing(false);
     } catch (err) {
-      console.error("Stop screen share error:", err);
+      console.error('Stop screen share error:', err);
     }
   };
 
