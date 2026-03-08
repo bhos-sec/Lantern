@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Zap, Settings, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
+import { Zap, Settings, Volume2, VolumeX } from 'lucide-react';
 import { socket } from '../lib/socket';
+import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import { useAppContext } from '../context/AppContext';
-import { useTheme } from '../hooks/useTheme';
 import { MediaSettingsModal } from '../components/ui/MediaSettingsModal';
 import type { UseMediaReturn } from '../hooks/useMedia';
 import { cn } from '../lib/utils';
@@ -16,7 +16,6 @@ import { cn } from '../lib/utils';
 export function NameEntryPage({ media }: { media: UseMediaReturn }) {
   const { userName, setUserName, onlineUsers, soundEnabled, setSoundEnabled, sound, error } =
     useAppContext();
-  const { isDark, toggleTheme } = useTheme();
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -37,20 +36,13 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
     if (!userName.trim()) return;
     sound('click');
     setHasSubmitted(true);
-    socket.emit('set-name', userName);
+    socket.emit(SOCKET_MESSAGE.SET_NAME, userName);
   };
 
   return (
     <div className="min-h-dvh flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6 relative">
       {/* Top-right controls */}
       <div className="absolute top-6 right-6 flex items-center gap-2">
-        <button
-          onClick={toggleTheme}
-          className="p-3 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-2xl border border-zinc-200 dark:border-white/5 transition-all"
-          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
         <button
           onClick={() => {
             sound('click');
@@ -60,7 +52,7 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
             'p-3 rounded-2xl border transition-all',
             soundEnabled
               ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
-              : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-500',
+              : 'bg-zinc-800 border-white/5 text-zinc-500',
           )}
           title={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
         >
@@ -71,7 +63,7 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
             sound('click');
             setShowSettings(true);
           }}
-          className="p-3 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-2xl border border-zinc-200 dark:border-white/5 transition-all"
+          className="p-3 bg-zinc-900 text-zinc-400 hover:text-white rounded-2xl border border-white/5 transition-all"
           title="Media Settings"
         >
           <Settings size={20} />
@@ -107,7 +99,7 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
                 value={userName}
                 onChange={e => setUserName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && enterLobby()}
-                className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-2xl px-5 py-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
+                className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-600"
               />
             </div>
 

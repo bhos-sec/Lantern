@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface MediaPreferences {
   selectedAudioDevice: string;
@@ -59,61 +59,6 @@ export function useMedia(): UseMediaReturn {
   }, []);
 
   /**
-   * Starts a CSS `filter: blur()` pipeline on a hidden <video> → <canvas> and
-   * returns the canvas capture as a blurred video track.
-   */
-  const applyBlur = useCallback(
-    (rawStream: MediaStream): MediaStream => {
-      // Re-use or create the offscreen canvas + video elements
-      if (!blurCanvasRef.current) {
-        blurCanvasRef.current = document.createElement('canvas');
-      }
-      if (!blurVideoRef.current) {
-        blurVideoRef.current = document.createElement('video');
-        blurVideoRef.current.muted = true;
-        blurVideoRef.current.playsInline = true;
-      }
-
-      const canvas = blurCanvasRef.current;
-      const hiddenVideo = blurVideoRef.current;
-      hiddenVideo.srcObject = rawStream;
-
-      hiddenVideo.onloadedmetadata = () => {
-        canvas.width = hiddenVideo.videoWidth || 640;
-        canvas.height = hiddenVideo.videoHeight || 480;
-        hiddenVideo.play();
-      };
-
-      const ctx = canvas.getContext('2d')!;
-      const draw = () => {
-        if (hiddenVideo.readyState >= 2) {
-          ctx.filter = 'blur(10px)';
-          ctx.drawImage(hiddenVideo, 0, 0, canvas.width, canvas.height);
-          // Restore person silhouette with a slightly-blurred foreground pass
-          ctx.filter = 'blur(2px)';
-          ctx.drawImage(hiddenVideo, 0, 0, canvas.width, canvas.height);
-          ctx.filter = 'none';
-        }
-        blurAnimRef.current = requestAnimationFrame(draw);
-      };
-      cancelAnimationFrame(blurAnimRef.current);
-      blurAnimRef.current = requestAnimationFrame(draw);
-
-      // Combine canvas video track with original audio tracks
-      const canvasStream = (canvas as any).captureStream(30) as MediaStream;
-      return new MediaStream([...canvasStream.getVideoTracks(), ...rawStream.getAudioTracks()]);
-    },
-    [],
-  );
-
-  const stopBlur = useCallback(() => {
-    cancelAnimationFrame(blurAnimRef.current);
-    if (blurVideoRef.current) {
-      blurVideoRef.current.srcObject = null;
-    }
-  }, []);
-
-  /**
    * Tries to acquire camera+mic, then falls back to audio-only, then video-only.
    * Returns the stream or null on full failure.
    */
@@ -160,7 +105,6 @@ export function useMedia(): UseMediaReturn {
   };
 
   const stopAllTracks = () => {
-    stopBlur();
     localStream?.getTracks().forEach(t => t.stop());
     setLocalStream(null);
     setIsScreenSharing(false);
