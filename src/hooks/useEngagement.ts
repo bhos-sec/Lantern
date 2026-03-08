@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { socket } from '../lib/socket';
-import type {
-  RaiseHandPayload,
-  ReactionPayload,
-  Poll,
-  QAQuestion,
-} from '@shared/types';
+import type { RaiseHandPayload, ReactionPayload, Poll, QAQuestion } from '@shared/types';
 
 export interface EngagementReaction extends ReactionPayload {
   /** Unique key for animation/keying. */

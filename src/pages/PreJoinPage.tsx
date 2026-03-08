@@ -1,14 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import {
-  Mic,
-  MicOff,
-  Video,
-  VideoOff,
-  ChevronRight,
-  ChevronLeft,
-  Blend,
-} from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, ChevronRight, ChevronLeft, Blend } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../hooks/useTheme';
 import { cn } from '../lib/utils';
@@ -75,9 +67,8 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
             Ready to join?
           </h1>
           <p className="text-zinc-500 text-sm">
-            Room{' '}
-            <span className="font-semibold text-emerald-500">#{pendingRoomId}</span>
-            {' '}— configure your devices before entering.
+            Room <span className="font-semibold text-emerald-500">#{pendingRoomId}</span> —
+            configure your devices before entering.
           </p>
         </div>
 
@@ -103,7 +94,10 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => { sound('click'); media.toggleMute(); }}
+                  onClick={() => {
+                    sound('click');
+                    media.toggleMute();
+                  }}
                   className={cn(
                     'p-2 rounded-xl border transition-all',
                     media.isMuted
@@ -115,7 +109,10 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
                   {media.isMuted ? <MicOff size={16} /> : <Mic size={16} />}
                 </button>
                 <button
-                  onClick={() => { sound('click'); media.toggleVideo(); }}
+                  onClick={() => {
+                    sound('click');
+                    media.toggleVideo();
+                  }}
                   className={cn(
                     'p-2 rounded-xl border transition-all',
                     media.isVideoOff
@@ -200,7 +197,10 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
               </span>
               <div className="flex gap-2">
                 <button
-                  onClick={() => { sound('click'); media.setStartMuted(!media.startMuted); }}
+                  onClick={() => {
+                    sound('click');
+                    media.setStartMuted(!media.startMuted);
+                  }}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-medium transition-all',
                     media.startMuted
@@ -212,7 +212,10 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
                   {media.startMuted ? 'Muted' : 'Mic On'}
                 </button>
                 <button
-                  onClick={() => { sound('click'); media.setStartVideoOff(!media.startVideoOff); }}
+                  onClick={() => {
+                    sound('click');
+                    media.setStartVideoOff(!media.startVideoOff);
+                  }}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-medium transition-all',
                     media.startVideoOff
@@ -248,7 +251,10 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-2">
               <button
-                onClick={() => { sound('click'); onBack(); }}
+                onClick={() => {
+                  sound('click');
+                  onBack();
+                }}
                 className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-xl text-sm font-medium transition-all"
               >
                 <ChevronLeft size={16} />

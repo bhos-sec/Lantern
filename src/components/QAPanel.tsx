@@ -28,9 +28,7 @@ export function QAPanel({
   const [showAnswered, setShowAnswered] = useState(false);
 
   const visible = questions.filter(q => showAnswered || !q.answered);
-  const sorted = [...visible].sort(
-    (a, b) => b.upvotes.length - a.upvotes.length,
-  );
+  const sorted = [...visible].sort((a, b) => b.upvotes.length - a.upvotes.length);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,13 +78,9 @@ export function QAPanel({
                     : 'border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/30',
                 )}
               >
-                <p className="text-sm text-zinc-800 dark:text-zinc-200 leading-snug">
-                  {q.text}
-                </p>
+                <p className="text-sm text-zinc-800 dark:text-zinc-200 leading-snug">{q.text}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-                    {q.userName}
-                  </span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">{q.userName}</span>
                   <div className="flex items-center gap-2">
                     {q.answered && (
                       <span className="flex items-center gap-1 text-[10px] text-emerald-500">
@@ -124,7 +118,10 @@ export function QAPanel({
       </div>
 
       {/* Submit input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-zinc-200 dark:border-white/5 flex gap-2">
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 border-t border-zinc-200 dark:border-white/5 flex gap-2"
+      >
         <input
           type="text"
           value={inputText}

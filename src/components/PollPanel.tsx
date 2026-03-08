@@ -36,8 +36,7 @@ export function PollPanel({
     setCreating(false);
   };
 
-  const toggleExpanded = (id: string) =>
-    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleExpanded = (id: string) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
 
   const activePollCount = polls.filter(p => !p.closed).length;
 
@@ -122,9 +121,7 @@ export function PollPanel({
 
       {/* Polls list */}
       {polls.length === 0 && (
-        <p className="text-xs text-zinc-400 dark:text-zinc-600 text-center py-4">
-          No polls yet.
-        </p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-600 text-center py-4">No polls yet.</p>
       )}
       {[...polls].reverse().map(poll => {
         const totalVotes = poll.options.reduce((s, o) => s + o.votes.length, 0);
@@ -154,7 +151,11 @@ export function PollPanel({
                     Closed
                   </span>
                 )}
-                {isOpen ? <ChevronUp size={14} className="text-zinc-400" /> : <ChevronDown size={14} className="text-zinc-400" />}
+                {isOpen ? (
+                  <ChevronUp size={14} className="text-zinc-400" />
+                ) : (
+                  <ChevronDown size={14} className="text-zinc-400" />
+                )}
               </div>
             </div>
             <AnimatePresence>
@@ -167,7 +168,8 @@ export function PollPanel({
                 >
                   <div className="p-3 space-y-2">
                     {poll.options.map(option => {
-                      const pct = totalVotes > 0 ? Math.round((option.votes.length / totalVotes) * 100) : 0;
+                      const pct =
+                        totalVotes > 0 ? Math.round((option.votes.length / totalVotes) * 100) : 0;
                       const isMyVote = myVote?.id === option.id;
 
                       return (

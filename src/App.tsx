@@ -130,7 +130,14 @@ export default function App() {
       setPendingIsCreating(isCreating ?? false);
       setStep('pre-join');
     },
-    [userName, setPendingRoomId, setPendingRoomPassword, setPendingIsPrivate, setPendingIsCreating, setStep],
+    [
+      userName,
+      setPendingRoomId,
+      setPendingRoomPassword,
+      setPendingIsPrivate,
+      setPendingIsCreating,
+      setStep,
+    ],
   );
 
   /** Called from PreJoinPage "Join Now" — actually performs the join. */
