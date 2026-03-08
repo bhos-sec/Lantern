@@ -28,6 +28,8 @@ export interface PresenceUser {
   actualRoomId: string | null;
   isAdmin: boolean;
   isRoomPrivate: boolean;
+  /** Whether the user has been force-muted by the room admin */
+  isMuted?: boolean;
 }
 
 // ─── Socket Event Payloads (Client → Server) ─────────────────────────────────
@@ -89,6 +91,120 @@ export interface IncomingAnswerPayload {
 export interface IncomingIceCandidatePayload {
   from: string;
   candidate: RTCIceCandidateInit;
+}
+
+// ─── Host Controls (Issue #10) ──────────────────────────────────────────────
+
+/** Client → Server: mute a participant's microphone. */
+export interface MuteUserPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Client → Server: unmute a participant's microphone. */
+export interface UnmuteUserPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Client → Server: mute all participants in the room (host only). */
+export interface MuteAllPayload {
+  roomId: string;
+}
+
+/** Client → Server: remove a participant from the room. */
+export interface KickUserPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Server → Client: broadcast to a user that they were muted by the host. */
+export interface ForceMutedPayload {
+  reason?: string;
+}
+
+/** Server → Client: broadcast to a user that they were kicked by the host. */
+export interface KickedPayload {
+  reason?: string;
+}
+
+// ─── Meeting Engagement Tools (Issue #9) ────────────────────────────────────
+
+/** A raised-hand event broadcasted to the room. */
+export interface RaiseHandPayload {
+  userId: string;
+  userName: string;
+  raised: boolean; // true = raised, false = lowered
+}
+
+/** An emoji reaction sent by a participant. */
+export interface ReactionPayload {
+  userId: string;
+  userName: string;
+  emoji: string;
+}
+
+/** A poll option. */
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: string[]; // array of voter userIds
+}
+
+/** A full poll object. */
+export interface Poll {
+  id: string;
+  roomId: string;
+  createdBy: string;
+  question: string;
+  options: PollOption[];
+  closed: boolean;
+  createdAt: string;
+}
+
+/** Client → Server: create a new poll. */
+export interface CreatePollPayload {
+  roomId: string;
+  question: string;
+  options: string[]; // option texts
+}
+
+/** Client → Server: cast a vote on a poll option. */
+export interface VotePollPayload {
+  roomId: string;
+  pollId: string;
+  optionId: string;
+}
+
+/** A Q&A question submitted by a participant. */
+export interface QAQuestion {
+  id: string;
+  roomId: string;
+  userId: string;
+  userName: string;
+  text: string;
+  upvotes: string[]; // userIds who upvoted
+  answered: boolean;
+  createdAt: string;
+}
+
+/** Client → Server: submit a question. */
+export interface SubmitQuestionPayload {
+  roomId: string;
+  text: string;
+  userName: string;
+}
+
+/** Client → Server: upvote a question. */
+export interface UpvoteQuestionPayload {
+  roomId: string;
+  questionId: string;
+}
+
+/** Client → Server: mark a question as answered (host only). */
+export interface AnswerQuestionPayload {
+  roomId: string;
+  questionId: string;
 }
 
 // ─── Abuse Prevention (Server → Client) ──────────────────────────────────────

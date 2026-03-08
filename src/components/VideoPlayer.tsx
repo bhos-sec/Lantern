@@ -19,6 +19,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   isMuted,
   isFullscreen,
   onToggleFullscreen,
+  handRaised,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -171,6 +172,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           {userName} {isLocal && '(You)'}
         </span>
       </div>
+
+      {/* Raised hand badge */}
+      {handRaised && (
+        <div className="absolute top-4 left-4 flex items-center gap-1.5 px-2.5 py-1.5 bg-yellow-400/90 backdrop-blur-md rounded-full border border-yellow-300/50 animate-bounce">
+          <Hand size={14} className="text-yellow-900" />
+          <span className="text-xs font-semibold text-yellow-900">Hand Raised</span>
+        </div>
+      )}
 
       {isFullscreen && (
         <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 p-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -58,6 +58,29 @@ export function useMedia(): UseMediaReturn {
       .catch(console.error);
   }, []);
 
+  // Listen for force-mute from host
+  useEffect(() => {
+    const handleForceMuted = () => {
+      if (localStream) {
+        localStream.getAudioTracks().forEach(t => (t.enabled = false));
+        setIsMuted(true);
+      }
+    };
+    const handleForceUnmuted = () => {
+      if (localStream) {
+        localStream.getAudioTracks().forEach(t => (t.enabled = true));
+        setIsMuted(false);
+      }
+    };
+
+    socket.on('force-muted', handleForceMuted);
+    socket.on('force-unmuted', handleForceUnmuted);
+    return () => {
+      socket.off('force-muted', handleForceMuted);
+      socket.off('force-unmuted', handleForceUnmuted);
+    };
+  }, [localStream]);
+
   /**
    * Tries to acquire camera+mic, then falls back to audio-only, then video-only.
    * Returns the stream or null on full failure.

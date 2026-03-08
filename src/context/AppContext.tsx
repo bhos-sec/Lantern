@@ -96,6 +96,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addNotification(message, 'error');
     });
 
+    // ── Host control feedback ─────────────────────────────────────────────
+    socket.on('force-muted', ({ reason }: { reason?: string }) => {
+      addNotification(reason || 'You were muted by the host', 'info');
+    });
+
+    socket.on('force-unmuted', ({ reason }: { reason?: string }) => {
+      addNotification(reason || 'You were unmuted', 'info');
+    });
+
+    socket.on('kicked', ({ reason }: { reason?: string }) => {
+      setError(reason || 'You were removed from the room by the host');
+      addNotification(reason || 'You were removed from the room', 'error');
+      // Optionally: go back to lobby after a brief delay
+      setTimeout(() => setStep('lobby'), 2000);
+    });
+
     // ── Device-session events ─────────────────────────────────────────────
     // Server tells this tab it's a duplicate (another tab is already active).
     socket.on(SOCKET_MESSAGE.DUPLICATE_SESSION, () => {

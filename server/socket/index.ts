@@ -3,6 +3,7 @@ import { registerUserHandlers } from './handlers/userHandler';
 import { registerRoomHandlers } from './handlers/roomHandler';
 import { registerChatHandlers } from './handlers/chatHandler';
 import { registerWebRTCHandlers } from './handlers/webrtcHandler';
+import { registerEngagementHandlers } from './handlers/engagementHandler';
 import { deviceSessionRepository } from '../repositories/deviceSessionRepository.js';
 import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import { IS_PROD } from '../config.js';
@@ -46,6 +47,7 @@ export function initSocketHandlers(io: Server): void {
     registerRoomHandlers(socket, io);
     registerChatHandlers(socket, io);
     registerWebRTCHandlers(socket);
+    registerEngagementHandlers(socket, io);
 
     // ── Take-over: let the new tab claim the session ──────────────────────
     // When the user clicks "Use This Tab" on the DuplicateSessionPage,

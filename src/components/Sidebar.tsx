@@ -1,9 +1,10 @@
 import React from 'react';
 import { Message } from '../types';
 import { Chat } from './Chat';
-import { Users, MessageSquare, X } from 'lucide-react';
+import { Users, MessageSquare, X, Mic, MicOff, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import type { PresenceUser } from '@shared/types';
 
 interface SidebarProps {
   activeTab: 'chat' | 'room' | 'all';
@@ -12,7 +13,7 @@ interface SidebarProps {
   onSendMessage: (text: string, toUserId?: string) => void;
   currentUserId: string;
   currentRoomId?: string;
-  onlineUsers: { id: string; name: string; roomId: string | null; actualRoomId?: string | null }[];
+  onlineUsers: PresenceUser[];
   onClose?: () => void;
   onJoinRoom: (
     roomId: string,
@@ -22,6 +23,11 @@ interface SidebarProps {
   ) => void;
   onPlaySound?: (type: 'click' | 'message' | 'join') => void;
   isRoomPage?: boolean;
+  isAdmin?: boolean;
+  onMuteUser?: (userId: string) => void;
+  onUnmuteUser?: (userId: string) => void;
+  onMuteAll?: () => void;
+  onKickUser?: (userId: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -36,6 +42,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onJoinRoom,
   onPlaySound,
   isRoomPage,
+  isAdmin,
+  onMuteUser,
+  onUnmuteUser,
+  onMuteAll,
+  onKickUser,
 }) => {
   const [privateRecipient, setPrivateRecipient] = React.useState<{
     id: string;
@@ -143,6 +154,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">
                   In this Room
                 </h3>
+                {isAdmin && onMuteAll && (
+                  <button
+                    onClick={() => {
+                      onPlaySound?.('click');
+                      onMuteAll();
+                    }}
+                    className="flex items-center gap-1 px-2 py-1 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg text-[10px] font-bold transition-all border border-red-500/20"
+                    title="Mute All Participants"
+                  >
+                    <MicOff size={12} />
+                    Mute All
+                  </button>
+                )}
               </div>
               {roomUsers.map(user => (
                 <div
@@ -162,19 +186,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </span>
                     </div>
                   </div>
-                  {user.id !== currentUserId && (
-                    <button
-                      onClick={() => {
-                        onPlaySound?.('click');
-                        setPrivateRecipient({ id: user.id, name: user.name });
-                        onTabChange('chat');
-                      }}
-                      className="p-2 text-zinc-500 hover:text-emerald-500 transition-colors"
-                      title="Send Private Message"
-                    >
-                      <MessageSquare size={16} />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1">
+                    {user.id !== currentUserId && (
+                      <>
+                        {isAdmin && (
+                          <>
+                            <button
+                              onClick={() => {
+                                onPlaySound?.('click');
+                                if (user.isMuted) {
+                                  onUnmuteUser?.(user.id);
+                                } else {
+                                  onMuteUser?.(user.id);
+                                }
+                              }}
+                              className={cn(
+                                'p-2 rounded-lg transition-all border',
+                                user.isMuted
+                                  ? 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white'
+                                  : 'text-zinc-500 border-zinc-200 dark:border-white/5 hover:text-emerald-500 dark:hover:text-emerald-400',
+                              )}
+                              title={user.isMuted ? 'Unmute Participant' : 'Mute Participant'}
+                            >
+                              {user.isMuted ? <MicOff size={16} /> : <Mic size={16} />}
+                            </button>
+                            <button
+                              onClick={() => {
+                                onPlaySound?.('click');
+                                onKickUser?.(user.id);
+                              }}
+                              className="p-2 text-zinc-500 hover:text-red-500 rounded-lg transition-all border border-zinc-200 dark:border-white/5 hover:border-red-500/20 hover:bg-red-500/10"
+                              title="Kick Participant"
+                            >
+                              <LogOut size={16} />
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => {
+                            onPlaySound?.('click');
+                            setPrivateRecipient({ id: user.id, name: user.name });
+                            onTabChange('chat');
+                          }}
+                          className="p-2 text-zinc-500 hover:text-emerald-500 transition-colors"
+                          title="Send Private Message"
+                        >
+                          <MessageSquare size={16} />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </motion.div>
