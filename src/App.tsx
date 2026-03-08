@@ -10,6 +10,7 @@ import { useRoom } from './hooks/useRoom';
 import { NotificationToast } from './components/ui/NotificationToast';
 import { NameEntryPage } from './pages/NameEntryPage';
 import { LobbyPage } from './pages/LobbyPage';
+import { PreJoinPage } from './pages/PreJoinPage';
 import { RoomPage } from './pages/RoomPage';
 import { DuplicateSessionPage } from './pages/DuplicateSessionPage';
 
@@ -116,6 +117,28 @@ export default function App() {
     [userName, media],
   );
 
+  /**
+   * Called by LobbyPage. Instead of joining immediately, stash the room
+   * details and navigate to the pre-join screen for device preview.
+   */
+  const goToPreJoin = useCallback(
+    async (idToJoin: string, password?: string, isPrivate?: boolean, isCreating?: boolean) => {
+      if (!idToJoin || !userName) return;
+      setPendingRoomId(idToJoin);
+      setPendingRoomPassword(password);
+      setPendingIsPrivate(isPrivate ?? false);
+      setPendingIsCreating(isCreating ?? false);
+      setStep('pre-join');
+    },
+    [userName, setPendingRoomId, setPendingRoomPassword, setPendingIsPrivate, setPendingIsCreating, setStep],
+  );
+
+  /** Called from PreJoinPage "Join Now" — actually performs the join. */
+  const confirmPreJoin = useCallback(async () => {
+    if (!pendingRoomId) return;
+    await joinRoom(pendingRoomId, pendingRoomPassword, pendingIsPrivate, pendingIsCreating);
+  }, [pendingRoomId, pendingRoomPassword, pendingIsPrivate, pendingIsCreating, joinRoom]);
+
   /** Stop tracks, close peers, clear messages, go back to lobby. */
   const leaveRoom = useCallback(() => {
     sound('click');
@@ -174,7 +197,18 @@ export default function App() {
 
       {step === 'name' && <NameEntryPage media={media} />}
 
-      {step === 'lobby' && <LobbyPage media={media} onJoinRoom={joinRoom} />}
+      {step === 'lobby' && <LobbyPage media={media} onJoinRoom={goToPreJoin} />}
+
+      {step === 'pre-join' && (
+        <PreJoinPage
+          media={media}
+          onConfirmJoin={confirmPreJoin}
+          onBack={() => {
+            media.stopAllTracks();
+            setStep('lobby');
+          }}
+        />
+      )}
 
       {step === 'room' && (
         <RoomPage
@@ -188,7 +222,7 @@ export default function App() {
         />
       )}
 
-      {step !== 'name' && step !== 'lobby' && step !== 'room' && (
+      {step !== 'name' && step !== 'lobby' && step !== 'pre-join' && step !== 'room' && (
         <div className="min-h-dvh flex items-center justify-center bg-zinc-950">
           <button
             onClick={() => setStep('name')}

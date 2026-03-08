@@ -5,6 +5,7 @@ interface MediaPreferences {
   selectedVideoDevice: string;
   startMuted: boolean;
   startVideoOff: boolean;
+  backgroundBlurEnabled: boolean;
 }
 
 export interface UseMediaReturn extends MediaPreferences {
@@ -18,6 +19,7 @@ export interface UseMediaReturn extends MediaPreferences {
   setSelectedVideoDevice: (id: string) => void;
   setStartMuted: (v: boolean) => void;
   setStartVideoOff: (v: boolean) => void;
+  setBackgroundBlurEnabled: (v: boolean) => void;
   acquireMedia: () => Promise<MediaStream | null>;
   stopAllTracks: () => void;
   toggleMute: () => void;
@@ -37,6 +39,12 @@ export function useMedia(): UseMediaReturn {
   const [selectedVideoDevice, setSelectedVideoDevice] = useState('');
   const [startMuted, setStartMuted] = useState(false);
   const [startVideoOff, setStartVideoOff] = useState(false);
+  const [backgroundBlurEnabled, setBackgroundBlurEnabled] = useState(false);
+
+  // Canvas + animation-frame refs for the blur pipeline
+  const blurCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const blurAnimRef = useRef<number>(0);
+  const blurVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Enumerate available devices once on mount
   useEffect(() => {
@@ -89,8 +97,11 @@ export function useMedia(): UseMediaReturn {
     stream.getVideoTracks().forEach(t => (t.enabled = !startVideoOff));
     setIsMuted(startMuted);
     setIsVideoOff(startVideoOff);
-    setLocalStream(stream);
-    return stream;
+
+    // Apply background blur if requested
+    const finalStream = backgroundBlurEnabled ? applyBlur(stream) : stream;
+    setLocalStream(finalStream);
+    return finalStream;
   };
 
   const stopAllTracks = () => {
@@ -174,10 +185,12 @@ export function useMedia(): UseMediaReturn {
     selectedVideoDevice,
     startMuted,
     startVideoOff,
+    backgroundBlurEnabled,
     setSelectedAudioDevice,
     setSelectedVideoDevice,
     setStartMuted,
     setStartVideoOff,
+    setBackgroundBlurEnabled,
     acquireMedia,
     stopAllTracks,
     toggleMute,

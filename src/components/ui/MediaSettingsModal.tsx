@@ -12,10 +12,12 @@ interface Props {
   selectedVideoDevice: string;
   startMuted: boolean;
   startVideoOff: boolean;
+  backgroundBlurEnabled?: boolean;
   onAudioDeviceChange: (id: string) => void;
   onVideoDeviceChange: (id: string) => void;
   onStartMutedChange: (v: boolean) => void;
   onStartVideoOffChange: (v: boolean) => void;
+  onBackgroundBlurChange?: (v: boolean) => void;
 }
 
 /** Modal for selecting camera/mic and setting join-time media defaults. */
@@ -28,10 +30,12 @@ export function MediaSettingsModal({
   selectedVideoDevice,
   startMuted,
   startVideoOff,
+  backgroundBlurEnabled = false,
   onAudioDeviceChange,
   onVideoDeviceChange,
   onStartMutedChange,
   onStartVideoOffChange,
+  onBackgroundBlurChange,
 }: Props) {
   return (
     <AnimatePresence>
@@ -128,6 +132,22 @@ export function MediaSettingsModal({
                     Mic {startMuted ? 'Off' : 'On'}
                   </button>
                 </div>
+
+                {/* Background blur toggle */}
+                {onBackgroundBlurChange && (
+                  <button
+                    onClick={() => onBackgroundBlurChange(!backgroundBlurEnabled)}
+                    className={cn(
+                      'w-full flex items-center justify-center gap-2 p-3 rounded-2xl border transition-all text-sm font-medium',
+                      backgroundBlurEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
+                        : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300',
+                    )}
+                  >
+                    <Blend size={16} />
+                    Background Blur {backgroundBlurEnabled ? 'On' : 'Off'}
+                  </button>
+                )}
               </div>
 
               <button

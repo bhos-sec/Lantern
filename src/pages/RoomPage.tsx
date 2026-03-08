@@ -334,10 +334,12 @@ export function RoomPage({
         selectedVideoDevice={media.selectedVideoDevice}
         startMuted={media.startMuted}
         startVideoOff={media.startVideoOff}
+        backgroundBlurEnabled={media.backgroundBlurEnabled}
         onAudioDeviceChange={media.setSelectedAudioDevice}
         onVideoDeviceChange={media.setSelectedVideoDevice}
         onStartMutedChange={media.setStartMuted}
         onStartVideoOffChange={media.setStartVideoOff}
+        onBackgroundBlurChange={media.setBackgroundBlurEnabled}
       />
     </div>
   );
