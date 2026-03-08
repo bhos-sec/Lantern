@@ -1,7 +1,7 @@
 import React from 'react';
 import { Message } from '../types';
 import { Chat } from './Chat';
-import { Users, MessageSquare, X, Mic, MicOff, LogOut } from 'lucide-react';
+import { Users, MessageSquare, X, Mic, MicOff, LogOut, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import type { PresenceUser } from '@shared/types';
@@ -52,6 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     id: string;
     name: string;
   } | null>(null);
+  const [joiningRoomId, setJoiningRoomId] = React.useState<string | null>(null);
+  const [joiningPassword, setJoiningPassword] = React.useState('');
   const roomUsers = onlineUsers.filter(u => u.actualRoomId === currentRoomId);
 
   return (
@@ -191,25 +193,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <>
                         {isAdmin && (
                           <>
-                            <button
-                              onClick={() => {
-                                onPlaySound?.('click');
-                                if (user.isMuted) {
-                                  onUnmuteUser?.(user.id);
-                                } else {
+                            {/* Mic: can only mute, never force-unmute (privacy) */}
+                            {user.isMuted ? (
+                              <div
+                                className="p-2 rounded-lg border bg-red-500/10 text-red-500 border-red-500/20 cursor-default"
+                                title="User is muted (user must unmute themselves)"
+                              >
+                                <MicOff size={16} />
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  onPlaySound?.('click');
                                   onMuteUser?.(user.id);
-                                }
-                              }}
-                              className={cn(
-                                'p-2 rounded-lg transition-all border',
-                                user.isMuted
-                                  ? 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white'
-                                  : 'text-zinc-500 border-zinc-200 dark:border-white/5 hover:text-emerald-500 dark:hover:text-emerald-400',
-                              )}
-                              title={user.isMuted ? 'Unmute Participant' : 'Mute Participant'}
-                            >
-                              {user.isMuted ? <MicOff size={16} /> : <Mic size={16} />}
-                            </button>
+                                }}
+                                className="p-2 rounded-lg transition-all border text-zinc-500 border-zinc-200 dark:border-white/5 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20"
+                                title="Mute Participant"
+                              >
+                                <Mic size={16} />
+                              </button>
+                            )}
                             <button
                               onClick={() => {
                                 onPlaySound?.('click');
@@ -296,14 +299,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       user.actualRoomId !== currentRoomId &&
                       !user.isRoomPrivate &&
                       !isRoomPage && (
-                        <button
-                          onClick={() =>
-                            onJoinRoom(user.actualRoomId!, undefined, undefined, false)
-                          }
-                          className="px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg text-[10px] font-bold transition-all border border-emerald-500/20"
-                        >
-                          Join
-                        </button>
+                        joiningRoomId === user.actualRoomId ? (
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="password"
+                              placeholder="Password"
+                              value={joiningPassword}
+                              onChange={e => setJoiningPassword(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') { onJoinRoom(user.actualRoomId!, joiningPassword, undefined, false); setJoiningRoomId(null); setJoiningPassword(''); }
+                                if (e.key === 'Escape') { setJoiningRoomId(null); setJoiningPassword(''); }
+                              }}
+                              className="w-20 px-2 py-1 text-[10px] bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 text-zinc-900 dark:text-white placeholder:text-zinc-400"
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => { onJoinRoom(user.actualRoomId!, joiningPassword, undefined, false); setJoiningRoomId(null); setJoiningPassword(''); }}
+                              className="px-1.5 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-bold"
+                            >
+                              Go
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            {user.hasPassword && <Lock size={10} className="text-zinc-400" title="Password required" />}
+                            <button
+                              onClick={() => {
+                                onPlaySound?.('click');
+                                if (user.hasPassword) {
+                                  setJoiningRoomId(user.actualRoomId!);
+                                } else {
+                                  onJoinRoom(user.actualRoomId!, undefined, undefined, false);
+                                }
+                              }}
+                              className="px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg text-[10px] font-bold transition-all border border-emerald-500/20"
+                            >
+                              Join
+                            </button>
+                          </div>
+                        )
                       )}
                   </div>
                 </div>

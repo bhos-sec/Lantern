@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Hash, Shield, Zap, Users, Settings, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
+import { Hash, Shield, Zap, Users, Settings, Volume2, VolumeX, Sun, Moon, Lock } from 'lucide-react';
 import { socket } from '../lib/socket';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../hooks/useTheme';
@@ -34,6 +34,8 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
   const [sessionTab, setSessionTab] = useState<'create' | 'join'>('create');
   const [lobbyTab, setLobbyTab] = useState<'rooms' | 'people'>('rooms');
   const [showSettings, setShowSettings] = useState(false);
+  const [joiningRoomId, setJoiningRoomId] = useState<string | null>(null);
+  const [joiningPassword, setJoiningPassword] = useState('');
 
   // Unique public rooms visible to this client
   const activeRooms = [...new Set(onlineUsers.map(u => u.roomId).filter(Boolean))] as string[];
@@ -278,12 +280,47 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                               </span>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleJoin(room, undefined, undefined, false)}
-                            className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-xl text-xs font-bold transition-all border border-emerald-500/20"
-                          >
-                            Join
-                          </button>
+                          {joiningRoomId === room ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="password"
+                                placeholder="Password"
+                                value={joiningPassword}
+                                onChange={e => setJoiningPassword(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') { handleJoin(room, joiningPassword, undefined, false); setJoiningRoomId(null); setJoiningPassword(''); }
+                                  if (e.key === 'Escape') { setJoiningRoomId(null); setJoiningPassword(''); }
+                                }}
+                                className="w-24 px-2 py-1.5 text-xs bg-zinc-100 dark:bg-zinc-700 border border-zinc-300 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-zinc-900 dark:text-white placeholder:text-zinc-400"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => { handleJoin(room, joiningPassword, undefined, false); setJoiningRoomId(null); setJoiningPassword(''); }}
+                                className="px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg text-xs font-bold transition-all"
+                              >
+                                Go
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              {onlineUsers.find(u => u.roomId === room)?.hasPassword && (
+                                <Lock size={13} className="text-zinc-400" title="Password required" />
+                              )}
+                              <button
+                                onClick={() => {
+                                  if (onlineUsers.find(u => u.roomId === room)?.hasPassword) {
+                                    sound('click');
+                                    setJoiningRoomId(room);
+                                  } else {
+                                    handleJoin(room, undefined, undefined, false);
+                                  }
+                                }}
+                                className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-xl text-xs font-bold transition-all border border-emerald-500/20"
+                              >
+                                Join
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ))
                     )}
@@ -327,14 +364,47 @@ export function LobbyPage({ onJoinRoom, media }: LobbyPageProps) {
                               </div>
                             </div>
                             {user.actualRoomId && !user.isRoomPrivate && (
-                              <button
-                                onClick={() =>
-                                  handleJoin(user.actualRoomId!, undefined, undefined, false)
-                                }
-                                className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg text-xs font-bold transition-all border border-emerald-500/20"
-                              >
-                                Join
-                              </button>
+                              joiningRoomId === user.actualRoomId ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="password"
+                                    placeholder="Password"
+                                    value={joiningPassword}
+                                    onChange={e => setJoiningPassword(e.target.value)}
+                                    onKeyDown={e => {
+                                      if (e.key === 'Enter') { handleJoin(user.actualRoomId!, joiningPassword, undefined, false); setJoiningRoomId(null); setJoiningPassword(''); }
+                                      if (e.key === 'Escape') { setJoiningRoomId(null); setJoiningPassword(''); }
+                                    }}
+                                    className="w-24 px-2 py-1.5 text-xs bg-zinc-100 dark:bg-zinc-700 border border-zinc-300 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-zinc-900 dark:text-white placeholder:text-zinc-400"
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={() => { handleJoin(user.actualRoomId!, joiningPassword, undefined, false); setJoiningRoomId(null); setJoiningPassword(''); }}
+                                    className="px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg text-xs font-bold transition-all"
+                                  >
+                                    Go
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  {user.hasPassword && (
+                                    <Lock size={12} className="text-zinc-400" title="Password required" />
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      if (user.hasPassword) {
+                                        sound('click');
+                                        setJoiningRoomId(user.actualRoomId!);
+                                      } else {
+                                        handleJoin(user.actualRoomId!, undefined, undefined, false);
+                                      }
+                                    }}
+                                    className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg text-xs font-bold transition-all border border-emerald-500/20"
+                                  >
+                                    Join
+                                  </button>
+                                </div>
+                              )
                             )}
                           </div>
                         ))

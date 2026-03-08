@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Zap, Settings, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import { socket } from '../lib/socket';
+import { SOCKET_EVENTS } from '@shared/events';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../hooks/useTheme';
 import { MediaSettingsModal } from '../components/ui/MediaSettingsModal';
@@ -37,7 +38,7 @@ export function NameEntryPage({ media }: { media: UseMediaReturn }) {
     if (!userName.trim()) return;
     sound('click');
     setHasSubmitted(true);
-    socket.emit('set-name', userName);
+    socket.emit(SOCKET_EVENTS.SET_NAME, userName);
   };
 
   return (

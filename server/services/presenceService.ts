@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import { userRepository } from '../repositories/userRepository';
 import { roomRepository } from '../repositories/roomRepository';
 import type { PresenceUser } from '@shared/types';
+import { SOCKET_EVENTS } from '@shared/events';
 
 /**
  * Build and broadcast the full presence snapshot to every connected client.
@@ -20,8 +21,10 @@ export function broadcastPresence(io: Server): void {
       isAdmin: meta ? meta.adminId === id : false,
       isRoomPrivate: meta ? meta.isPrivate : false,
       isMuted: data.isMuted ?? false,
+      isCameraOff: data.isCameraOff ?? false,
+      hasPassword: !!(meta?.password),
     };
   });
 
-  io.emit('presence-update', userList);
+  io.emit(SOCKET_EVENTS.PRESENCE_UPDATE, userList);
 }

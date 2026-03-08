@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { socket } from '../lib/socket';
+import { SOCKET_EVENTS } from '@shared/events';
 
 interface MediaPreferences {
   selectedAudioDevice: string;
@@ -46,6 +47,11 @@ export function useMedia(): UseMediaReturn {
   const blurCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const blurAnimRef = useRef<number>(0);
   const blurVideoRef = useRef<HTMLVideoElement | null>(null);
+  // Stores the raw (pre-blur) camera stream so blur can be toggled live
+  const rawStreamRef = useRef<MediaStream | null>(null);
+  // Tracks latest isVideoOff to avoid stale closures in the blur toggle effect
+  const isVideoOffRef = useRef(isVideoOff);
+  isVideoOffRef.current = isVideoOff;
 
   // Enumerate available devices once on mount
   useEffect(() => {
@@ -73,12 +79,22 @@ export function useMedia(): UseMediaReturn {
         setIsMuted(false);
       }
     };
+    const handleForceCameraOff = () => {
+      if (localStream) {
+        localStream.getVideoTracks().forEach(t => (t.enabled = false));
+        setIsVideoOff(true);
+        // Disable blur so the blur pipeline doesn't run on a black frame
+        setBackgroundBlurEnabled(false);
+      }
+    };
 
-    socket.on('force-muted', handleForceMuted);
-    socket.on('force-unmuted', handleForceUnmuted);
+    socket.on(SOCKET_EVENTS.FORCE_MUTED, handleForceMuted);
+    socket.on(SOCKET_EVENTS.FORCE_UNMUTED, handleForceUnmuted);
+    socket.on(SOCKET_EVENTS.FORCE_CAMERA_OFF, handleForceCameraOff);
     return () => {
-      socket.off('force-muted', handleForceMuted);
-      socket.off('force-unmuted', handleForceUnmuted);
+      socket.off(SOCKET_EVENTS.FORCE_MUTED, handleForceMuted);
+      socket.off(SOCKET_EVENTS.FORCE_UNMUTED, handleForceUnmuted);
+      socket.off(SOCKET_EVENTS.FORCE_CAMERA_OFF, handleForceCameraOff);
     };
   }, [localStream]);
 
@@ -137,6 +153,26 @@ export function useMedia(): UseMediaReturn {
     }
   }, []);
 
+  // Live blur toggle: re-process the raw stream when backgroundBlurEnabled changes
+  // after media has already been acquired (rawStreamRef is populated).
+  useEffect(() => {
+    if (!rawStreamRef.current) return;
+    if (backgroundBlurEnabled) {
+      const blurred = applyBlur(rawStreamRef.current);
+      // Sync video-off state onto the new canvas track
+      blurred.getVideoTracks().forEach(t => (t.enabled = !isVideoOffRef.current));
+      setLocalStream(blurred);
+    } else {
+      stopBlur();
+      const raw = rawStreamRef.current;
+      // Raw audio tracks were shared with the blurred stream — enabled state is current.
+      // Raw video track was bypassed by the canvas and needs its state restored.
+      raw.getVideoTracks().forEach(t => (t.enabled = !isVideoOffRef.current));
+      setLocalStream(raw);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [backgroundBlurEnabled]);
+
   /**
    * Tries to acquire camera+mic, then falls back to audio-only, then video-only.
    * Returns the stream or null on full failure.
@@ -177,6 +213,8 @@ export function useMedia(): UseMediaReturn {
     setIsMuted(startMuted);
     setIsVideoOff(startVideoOff);
 
+    // Store the raw stream so the live blur toggle can switch back without re-acquiring
+    rawStreamRef.current = stream;
     // Apply background blur if requested
     const finalStream = backgroundBlurEnabled ? applyBlur(stream) : stream;
     setLocalStream(finalStream);
@@ -200,6 +238,10 @@ export function useMedia(): UseMediaReturn {
     if (!localStream) return;
     localStream.getVideoTracks().forEach(t => (t.enabled = !t.enabled));
     setIsVideoOff(prev => !prev);
+    // If turning camera off while blur is active, turn blur off too
+    if (!isVideoOff && backgroundBlurEnabled) {
+      setBackgroundBlurEnabled(false);
+    }
   };
 
   const toggleScreenShare = async (peers: Record<string, RTCPeerConnection>) => {

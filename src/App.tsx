@@ -12,6 +12,7 @@ import { LobbyPage } from './pages/LobbyPage';
 import { PreJoinPage } from './pages/PreJoinPage';
 import { RoomPage } from './pages/RoomPage';
 import { DuplicateSessionPage } from './pages/DuplicateSessionPage';
+import { SOCKET_EVENTS } from '@shared/events';
 
 /**
  * Root component — thin orchestrator.
@@ -58,11 +59,16 @@ export default function App() {
   useEffect(() => {
     const handleMessage = (msg: any) => {
       addMessage(msg);
-      if (msg.senderId !== socket.id) sound('message');
+      if (msg.senderId !== socket.id) {
+        sound('message');
+        if (msg.isPrivate) {
+          addNotification(`${msg.sender} sent you a private message`, 'info');
+        }
+      }
     };
-    socket.on('receive-message', handleMessage);
+    socket.on(SOCKET_EVENTS.RECEIVE_MESSAGE, handleMessage);
     return () => {
-      socket.off('receive-message', handleMessage);
+      socket.off(SOCKET_EVENTS.RECEIVE_MESSAGE, handleMessage);
     };
   }, [addMessage, sound]);
 
@@ -71,18 +77,10 @@ export default function App() {
     const handleJoinSuccess = (id: string) => {
       setRoomId(id);
       setStep('room');
-      // Sync mute/video UI with the actual track states acquired during join
-      if (media.localStream) {
-        const audio = media.localStream.getAudioTracks()[0];
-        const video = media.localStream.getVideoTracks()[0];
-        // The useMedia hook keeps isMuted / isVideoOff in sync via acquireMedia
-        _ = audio;
-        _ = video; // already set inside acquireMedia
-      }
     };
-    socket.on('join-room-success', handleJoinSuccess);
+    socket.on(SOCKET_EVENTS.JOIN_ROOM_SUCCESS, handleJoinSuccess);
     return () => {
-      socket.off('join-room-success', handleJoinSuccess);
+      socket.off(SOCKET_EVENTS.JOIN_ROOM_SUCCESS, handleJoinSuccess);
     };
   }, [media.localStream, setStep]);
 
@@ -92,9 +90,9 @@ export default function App() {
       leaveRoom();
       addNotification('The room was closed by the admin.', 'info');
     };
-    socket.on('room-closed', handleRoomClosed);
+    socket.on(SOCKET_EVENTS.ROOM_CLOSED, handleRoomClosed);
     return () => {
-      socket.off('room-closed', handleRoomClosed);
+      socket.off(SOCKET_EVENTS.ROOM_CLOSED, handleRoomClosed);
     };
   }, []);
 
@@ -104,7 +102,7 @@ export default function App() {
       if (!idToJoin || !userName) return;
       const stream = await media.acquireMedia();
       if (!stream) return; // Permission denied — acquireMedia shows the alert
-      socket.emit('join-room', {
+      socket.emit(SOCKET_EVENTS.JOIN_ROOM, {
         roomId: idToJoin,
         userName,
         password,
@@ -143,13 +141,17 @@ export default function App() {
     media.stopAllTracks();
     closeAllPeers();
     clearMessages();
-    socket.emit('leave-room', roomId);
+    socket.emit(SOCKET_EVENTS.LEAVE_ROOM, roomId);
     setStep('lobby');
   }, [media, closeAllPeers, clearMessages, roomId, sound, setStep]);
 
+  const handleToggleScreenShare = useCallback(async () => {
+    await media.toggleScreenShare(peersRef.current ?? {});
+  }, [media]);
+
   const toggleRoomPrivacy = (isPrivate: boolean) => {
     sound('click');
-    socket.emit('toggle-room-privacy', isPrivate);
+    socket.emit(SOCKET_EVENTS.TOGGLE_ROOM_PRIVACY, isPrivate);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -217,6 +219,7 @@ export default function App() {
           onSendMessage={sendMessage}
           onLeaveRoom={leaveRoom}
           onTogglePrivacy={toggleRoomPrivacy}
+          onToggleScreenShare={handleToggleScreenShare}
         />
       )}
 
@@ -234,5 +237,4 @@ export default function App() {
   );
 }
 
-// Silence TS "variable declared but never read" for the sync block above
-declare let _: any;
+

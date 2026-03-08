@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { socket } from '../lib/socket';
+import { SOCKET_EVENTS } from '@shared/events';
 import type {
   RaiseHandPayload,
   ReactionPayload,
@@ -10,6 +11,8 @@ import type {
 export interface EngagementReaction extends ReactionPayload {
   /** Unique key for animation/keying. */
   key: string;
+  /** Stable horizontal position (%) computed once at creation to prevent jitter. */
+  left: number;
 }
 
 export interface UseEngagementReturn {
@@ -53,6 +56,7 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
       const entry: EngagementReaction = {
         ...payload,
         key: `${payload.userId}-${Date.now()}-${Math.random()}`,
+        left: 20 + Math.random() * 60,
       };
       setReactions(prev => [...prev, entry]);
       // Auto-clear after 4 s
@@ -88,43 +92,43 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
       setQuestions(initialQuestions);
     };
 
-    socket.on('hand-raised', onHandRaised);
-    socket.on('reaction-received', onReaction);
-    socket.on('poll-created', onPollCreated);
-    socket.on('poll-updated', onPollUpdated);
-    socket.on('question-submitted', onQuestionSubmitted);
-    socket.on('question-updated', onQuestionUpdated);
-    socket.on('engagement-state', onEngagementState);
+    socket.on(SOCKET_EVENTS.HAND_RAISED, onHandRaised);
+    socket.on(SOCKET_EVENTS.REACTION_RECEIVED, onReaction);
+    socket.on(SOCKET_EVENTS.POLL_CREATED, onPollCreated);
+    socket.on(SOCKET_EVENTS.POLL_UPDATED, onPollUpdated);
+    socket.on(SOCKET_EVENTS.QUESTION_SUBMITTED, onQuestionSubmitted);
+    socket.on(SOCKET_EVENTS.QUESTION_UPDATED, onQuestionUpdated);
+    socket.on(SOCKET_EVENTS.ENGAGEMENT_STATE, onEngagementState);
 
     return () => {
-      socket.off('hand-raised', onHandRaised);
-      socket.off('reaction-received', onReaction);
-      socket.off('poll-created', onPollCreated);
-      socket.off('poll-updated', onPollUpdated);
-      socket.off('question-submitted', onQuestionSubmitted);
-      socket.off('question-updated', onQuestionUpdated);
-      socket.off('engagement-state', onEngagementState);
+      socket.off(SOCKET_EVENTS.HAND_RAISED, onHandRaised);
+      socket.off(SOCKET_EVENTS.REACTION_RECEIVED, onReaction);
+      socket.off(SOCKET_EVENTS.POLL_CREATED, onPollCreated);
+      socket.off(SOCKET_EVENTS.POLL_UPDATED, onPollUpdated);
+      socket.off(SOCKET_EVENTS.QUESTION_SUBMITTED, onQuestionSubmitted);
+      socket.off(SOCKET_EVENTS.QUESTION_UPDATED, onQuestionUpdated);
+      socket.off(SOCKET_EVENTS.ENGAGEMENT_STATE, onEngagementState);
     };
   }, []);
 
   const raiseHand = useCallback(() => {
     setIsHandRaised(true);
-    socket.emit('raise-hand', { raised: true });
+    socket.emit(SOCKET_EVENTS.RAISE_HAND, { raised: true });
   }, []);
 
   const lowerHand = useCallback(() => {
     setIsHandRaised(false);
-    socket.emit('raise-hand', { raised: false });
+    socket.emit(SOCKET_EVENTS.RAISE_HAND, { raised: false });
   }, []);
 
   const sendReaction = useCallback((emoji: string) => {
-    socket.emit('send-reaction', { emoji });
+    socket.emit(SOCKET_EVENTS.SEND_REACTION, { emoji });
   }, []);
 
   const createPoll = useCallback(
     (question: string, options: string[]) => {
       if (!roomId) return;
-      socket.emit('create-poll', { roomId, question, options });
+      socket.emit(SOCKET_EVENTS.CREATE_POLL, { roomId, question, options });
     },
     [roomId],
   );
@@ -132,7 +136,7 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
   const votePoll = useCallback(
     (pollId: string, optionId: string) => {
       if (!roomId) return;
-      socket.emit('vote-poll', { roomId, pollId, optionId });
+      socket.emit(SOCKET_EVENTS.VOTE_POLL, { roomId, pollId, optionId });
     },
     [roomId],
   );
@@ -140,7 +144,7 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
   const closePoll = useCallback(
     (pollId: string) => {
       if (!roomId) return;
-      socket.emit('close-poll', { roomId, pollId });
+      socket.emit(SOCKET_EVENTS.CLOSE_POLL, { roomId, pollId });
     },
     [roomId],
   );
@@ -148,7 +152,7 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
   const submitQuestion = useCallback(
     (text: string, userName: string) => {
       if (!roomId) return;
-      socket.emit('submit-question', { roomId, text, userName });
+      socket.emit(SOCKET_EVENTS.SUBMIT_QUESTION, { roomId, text, userName });
     },
     [roomId],
   );
@@ -156,7 +160,7 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
   const upvoteQuestion = useCallback(
     (questionId: string) => {
       if (!roomId) return;
-      socket.emit('upvote-question', { roomId, questionId });
+      socket.emit(SOCKET_EVENTS.UPVOTE_QUESTION, { roomId, questionId });
     },
     [roomId],
   );
@@ -164,14 +168,14 @@ export function useEngagement(roomId: string | null): UseEngagementReturn {
   const answerQuestion = useCallback(
     (questionId: string) => {
       if (!roomId) return;
-      socket.emit('answer-question', { roomId, questionId });
+      socket.emit(SOCKET_EVENTS.ANSWER_QUESTION, { roomId, questionId });
     },
     [roomId],
   );
 
   const requestEngagementState = useCallback(() => {
     if (!roomId) return;
-    socket.emit('request-engagement-state', { roomId });
+    socket.emit(SOCKET_EVENTS.REQUEST_ENGAGEMENT_STATE, { roomId });
   }, [roomId]);
 
   return {

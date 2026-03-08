@@ -10,6 +10,8 @@ interface EngagementToolbarProps {
   onRaiseHand: () => void;
   onLowerHand: () => void;
   onSendReaction: (emoji: string) => void;
+  /** Total number of participants with their hand raised (including self). */
+  raisedHandCount?: number;
 }
 
 /**
@@ -20,6 +22,7 @@ export function EngagementToolbar({
   onRaiseHand,
   onLowerHand,
   onSendReaction,
+  raisedHandCount = 0,
 }: EngagementToolbarProps) {
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -38,18 +41,25 @@ export function EngagementToolbar({
   return (
     <div className="flex items-center gap-2 md:gap-4">
       {/* Raise Hand */}
-      <button
-        onClick={isHandRaised ? onLowerHand : onRaiseHand}
-        className={cn(
-          'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
-          isHandRaised
-            ? 'bg-yellow-400/10 border-yellow-400/50 text-yellow-400'
-            : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+      <div className="relative">
+        <button
+          onClick={isHandRaised ? onLowerHand : onRaiseHand}
+          className={cn(
+            'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
+            isHandRaised
+              ? 'bg-yellow-400/10 border-yellow-400/50 text-yellow-400'
+              : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+          )}
+          title={isHandRaised ? 'Lower hand' : 'Raise hand'}
+        >
+          <Hand size={20} className={isHandRaised ? 'animate-bounce' : ''} />
+        </button>
+        {raisedHandCount > 0 && (
+          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-yellow-400 text-yellow-900 text-[10px] font-bold rounded-full leading-none pointer-events-none">
+            {raisedHandCount}
+          </span>
         )}
-        title={isHandRaised ? 'Lower hand' : 'Raise hand'}
-      >
-        <Hand size={20} className={isHandRaised ? 'animate-bounce' : ''} />
-      </button>
+      </div>
 
       {/* Reaction Picker */}
       <div className="relative" ref={pickerRef}>
@@ -80,7 +90,6 @@ export function EngagementToolbar({
                   key={emoji}
                   onClick={() => {
                     onSendReaction(emoji);
-                    setShowPicker(false);
                   }}
                   className="text-2xl hover:scale-125 transition-transform p-1 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >

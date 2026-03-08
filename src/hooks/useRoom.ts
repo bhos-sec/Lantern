@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import type { Message } from '@shared/types';
+import { SOCKET_EVENTS } from '@shared/events';
 
 interface UseRoomProps {
   socket: Socket;
@@ -23,9 +24,9 @@ export function useRoom({ socket, userName, roomId }: UseRoomProps) {
   const sendMessage = useCallback(
     (text: string, toUserId?: string) => {
       if (toUserId) {
-        socket.emit('send-private-message', { toUserId, message: text, userName });
+        socket.emit(SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, { toUserId, message: text, userName });
       } else {
-        socket.emit('send-message', { roomId, message: text, userName });
+        socket.emit(SOCKET_EVENTS.SEND_MESSAGE, { roomId, message: text, userName });
       }
     },
     [socket, roomId, userName],

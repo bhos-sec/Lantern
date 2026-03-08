@@ -6,6 +6,7 @@ export interface UserRecord {
   roomId: string | null;
   showRoom: boolean;
   isMuted?: boolean; // Force-muted by the room admin
+  isCameraOff?: boolean; // Camera disabled (by admin or by user)
 }
 
 const store = new Map<string, UserRecord>();

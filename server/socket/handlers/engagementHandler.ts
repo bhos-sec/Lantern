@@ -1,5 +1,6 @@
 import { Socket, Server } from 'socket.io';
 import { userRepository } from '../../repositories/userRepository.js';
+import { roomRepository } from '../../repositories/roomRepository.js';
 import type {
   RaiseHandPayload,
   ReactionPayload,
@@ -11,6 +12,7 @@ import type {
   Poll,
   QAQuestion,
 } from '@shared/types';
+import { SOCKET_EVENTS } from '@shared/events';
 
 // ── In-memory stores ──────────────────────────────────────────────────────────
 /** roomId → Poll[] */
@@ -37,7 +39,7 @@ function randomId(): string {
  */
 export function registerEngagementHandlers(socket: Socket, io: Server): void {
   // ── Raise Hand ─────────────────────────────────────────────────────────────
-  socket.on('raise-hand', ({ raised }: { raised: boolean }) => {
+  socket.on(SOCKET_EVENTS.RAISE_HAND, ({ raised }: { raised: boolean }) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId) return;
 
@@ -46,11 +48,11 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
       userName: user.name,
       raised,
     };
-    io.to(user.roomId).emit('hand-raised', payload);
+    io.to(user.roomId).emit(SOCKET_EVENTS.HAND_RAISED, payload);
   });
 
   // ── Emoji Reaction ─────────────────────────────────────────────────────────
-  socket.on('send-reaction', ({ emoji }: { emoji: string }) => {
+  socket.on(SOCKET_EVENTS.SEND_REACTION, ({ emoji }: { emoji: string }) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId) return;
 
@@ -63,11 +65,11 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
       userName: user.name,
       emoji,
     };
-    io.to(user.roomId).emit('reaction-received', payload);
+    io.to(user.roomId).emit(SOCKET_EVENTS.REACTION_RECEIVED, payload);
   });
 
   // ── Polls ──────────────────────────────────────────────────────────────────
-  socket.on('create-poll', ({ roomId, question, options }: CreatePollPayload) => {
+  socket.on(SOCKET_EVENTS.CREATE_POLL, ({ roomId, question, options }: CreatePollPayload) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
     if (!question?.trim() || !options?.length || options.length < 2) return;
@@ -86,11 +88,11 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
     };
 
     getPollsForRoom(roomId).push(poll);
-    io.to(roomId).emit('poll-created', poll);
+    io.to(roomId).emit(SOCKET_EVENTS.POLL_CREATED, poll);
     console.log(`Poll created in room "${roomId}" by ${socket.id}`);
   });
 
-  socket.on('vote-poll', ({ roomId, pollId, optionId }: VotePollPayload) => {
+  socket.on(SOCKET_EVENTS.VOTE_POLL, ({ roomId, pollId, optionId }: VotePollPayload) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
 
@@ -107,10 +109,10 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
     if (!option) return;
     option.votes.push(socket.id);
 
-    io.to(roomId).emit('poll-updated', poll);
+    io.to(roomId).emit(SOCKET_EVENTS.POLL_UPDATED, poll);
   });
 
-  socket.on('close-poll', ({ roomId, pollId }: { roomId: string; pollId: string }) => {
+  socket.on(SOCKET_EVENTS.CLOSE_POLL, ({ roomId, pollId }: { roomId: string; pollId: string }) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
 
@@ -118,12 +120,16 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
     const poll = roomPolls.find(p => p.id === pollId);
     if (!poll) return;
 
+    // Only the poll creator or the room admin may close a poll
+    const meta = roomRepository.get(roomId);
+    if (poll.createdBy !== socket.id && meta?.adminId !== socket.id) return;
+
     poll.closed = true;
-    io.to(roomId).emit('poll-updated', poll);
+    io.to(roomId).emit(SOCKET_EVENTS.POLL_UPDATED, poll);
   });
 
   // ── Q&A ────────────────────────────────────────────────────────────────────
-  socket.on('submit-question', ({ roomId, text, userName }: SubmitQuestionPayload) => {
+  socket.on(SOCKET_EVENTS.SUBMIT_QUESTION, ({ roomId, text, userName }: SubmitQuestionPayload) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
     if (!text?.trim()) return;
@@ -140,10 +146,10 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
     };
 
     getQuestionsForRoom(roomId).push(question);
-    io.to(roomId).emit('question-submitted', question);
+    io.to(roomId).emit(SOCKET_EVENTS.QUESTION_SUBMITTED, question);
   });
 
-  socket.on('upvote-question', ({ roomId, questionId }: UpvoteQuestionPayload) => {
+  socket.on(SOCKET_EVENTS.UPVOTE_QUESTION, ({ roomId, questionId }: UpvoteQuestionPayload) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
 
@@ -158,10 +164,10 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
       question.upvotes.push(socket.id);
     }
 
-    io.to(roomId).emit('question-updated', question);
+    io.to(roomId).emit(SOCKET_EVENTS.QUESTION_UPDATED, question);
   });
 
-  socket.on('answer-question', ({ roomId, questionId }: AnswerQuestionPayload) => {
+  socket.on(SOCKET_EVENTS.ANSWER_QUESTION, ({ roomId, questionId }: AnswerQuestionPayload) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
 
@@ -170,15 +176,15 @@ export function registerEngagementHandlers(socket: Socket, io: Server): void {
     if (!question) return;
 
     question.answered = true;
-    io.to(roomId).emit('question-updated', question);
+    io.to(roomId).emit(SOCKET_EVENTS.QUESTION_UPDATED, question);
   });
 
   // ── State sync: send existing polls and questions on join ──────────────────
-  socket.on('request-engagement-state', ({ roomId }: { roomId: string }) => {
+  socket.on(SOCKET_EVENTS.REQUEST_ENGAGEMENT_STATE, ({ roomId }: { roomId: string }) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId || user.roomId !== roomId) return;
 
-    socket.emit('engagement-state', {
+    socket.emit(SOCKET_EVENTS.ENGAGEMENT_STATE, {
       polls: getPollsForRoom(roomId),
       questions: getQuestionsForRoom(roomId),
     });

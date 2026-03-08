@@ -14,12 +14,12 @@ export function ReactionsOverlay({ reactions }: ReactionsOverlayProps) {
         {reactions.map(r => (
           <motion.div
             key={r.key}
-            initial={{ opacity: 0, y: 60, x: Math.random() * 80 - 40 + '%' }}
-            animate={{ opacity: 1, y: -120 }}
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: -500 }}
             exit={{ opacity: 0, scale: 1.5 }}
-            transition={{ duration: 2.5, ease: 'easeOut' }}
-            className="absolute bottom-24 left-1/4 text-4xl select-none"
-            style={{ left: `${20 + Math.random() * 60}%` }}
+            transition={{ duration: 3, ease: 'easeOut' }}
+            className="absolute bottom-24 text-4xl select-none"
+            style={{ left: `${r.left}%` }}
           >
             {r.emoji}
           </motion.div>

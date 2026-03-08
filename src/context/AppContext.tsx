@@ -10,6 +10,7 @@ import { socket } from '../lib/socket';
 import { useNotifications } from '../hooks/useNotifications';
 import { playSound } from '../lib/sounds';
 import type { PresenceUser, RateLimitedPayload } from '@shared/types';
+import { SOCKET_EVENTS } from '@shared/events';
 
 export type AppStep = 'name' | 'lobby' | 'pre-join' | 'room';
 
@@ -95,36 +96,40 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Global socket listeners that affect top-level app state
   useEffect(() => {
-    socket.on('presence-update', setOnlineUsers);
+    socket.on(SOCKET_EVENTS.PRESENCE_UPDATE, setOnlineUsers);
 
-    socket.on('name-set-success', () => {
+    socket.on(SOCKET_EVENTS.NAME_SET_SUCCESS, () => {
       setStep('lobby');
       setError(null);
       sound('join');
       addNotification('Welcome to Lantern!', 'success');
     });
 
-    socket.on('error', (msg: string) => {
+    socket.on(SOCKET_EVENTS.ERROR, (msg: string) => {
       setError(msg);
       addNotification(msg, 'error');
     });
 
     // ── Rate-limit feedback ───────────────────────────────────────────────
-    socket.on('rate-limited', ({ message }: RateLimitedPayload) => {
+    socket.on(SOCKET_EVENTS.RATE_LIMITED, ({ message }: RateLimitedPayload) => {
       setError(message);
       addNotification(message, 'error');
     });
 
     // ── Host control feedback ─────────────────────────────────────────────
-    socket.on('force-muted', ({ reason }: { reason?: string }) => {
+    socket.on(SOCKET_EVENTS.FORCE_MUTED, ({ reason }: { reason?: string }) => {
       addNotification(reason || 'You were muted by the host', 'info');
     });
 
-    socket.on('force-unmuted', ({ reason }: { reason?: string }) => {
+    socket.on(SOCKET_EVENTS.FORCE_UNMUTED, ({ reason }: { reason?: string }) => {
       addNotification(reason || 'You were unmuted', 'info');
     });
 
-    socket.on('kicked', ({ reason }: { reason?: string }) => {
+    socket.on(SOCKET_EVENTS.FORCE_CAMERA_OFF, ({ reason }: { reason?: string }) => {
+      addNotification(reason || 'Your camera was disabled by the host', 'info');
+    });
+
+    socket.on(SOCKET_EVENTS.KICKED, ({ reason }: { reason?: string }) => {
       setError(reason || 'You were removed from the room by the host');
       addNotification(reason || 'You were removed from the room', 'error');
       // Optionally: go back to lobby after a brief delay
@@ -133,37 +138,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     // ── Device-session events ─────────────────────────────────────────────
     // Server tells this tab it's a duplicate (another tab is already active).
-    socket.on('duplicate-session', () => {
+    socket.on(SOCKET_EVENTS.DUPLICATE_SESSION, () => {
       setIsDuplicateSession(true);
     });
 
     // Server tells this tab its session was claimed by a newer tab.
-    socket.on('session-taken-over', () => {
+    socket.on(SOCKET_EVENTS.SESSION_TAKEN_OVER, () => {
       setIsSessionTakenOver(true);
     });
 
     // Server grants the take-over — clear the blocked state and resume.
-    socket.on('take-over-granted', () => {
+    socket.on(SOCKET_EVENTS.TAKE_OVER_GRANTED, () => {
       setIsDuplicateSession(false);
     });
 
     return () => {
-      socket.off('presence-update', setOnlineUsers);
-      socket.off('name-set-success');
-      socket.off('error');
-      socket.off('rate-limited');
-      socket.off('force-muted');
-      socket.off('force-unmuted');
-      socket.off('kicked');
-      socket.off('duplicate-session');
-      socket.off('session-taken-over');
-      socket.off('take-over-granted');
+      socket.off(SOCKET_EVENTS.PRESENCE_UPDATE, setOnlineUsers);
+      socket.off(SOCKET_EVENTS.NAME_SET_SUCCESS);
+      socket.off(SOCKET_EVENTS.ERROR);
+      socket.off(SOCKET_EVENTS.RATE_LIMITED);
+      socket.off(SOCKET_EVENTS.FORCE_MUTED);
+      socket.off(SOCKET_EVENTS.FORCE_UNMUTED);
+      socket.off(SOCKET_EVENTS.FORCE_CAMERA_OFF);
+      socket.off(SOCKET_EVENTS.KICKED);
+      socket.off(SOCKET_EVENTS.DUPLICATE_SESSION);
+      socket.off(SOCKET_EVENTS.SESSION_TAKEN_OVER);
+      socket.off(SOCKET_EVENTS.TAKE_OVER_GRANTED);
     };
   }, [sound, addNotification]);
 
   /** Ask the server to evict the existing session and grant this tab. */
   const takeOverSession = useCallback(() => {
-    socket.emit('take-over-session');
+    socket.emit(SOCKET_EVENTS.TAKE_OVER_SESSION);
   }, []);
 
   const value: AppContextValue = {

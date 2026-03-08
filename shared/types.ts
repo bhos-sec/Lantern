@@ -30,6 +30,10 @@ export interface PresenceUser {
   isRoomPrivate: boolean;
   /** Whether the user has been force-muted by the room admin */
   isMuted?: boolean;
+  /** Whether the user's camera is currently off (force-disabled or voluntary) */
+  isCameraOff?: boolean;
+  /** Whether the user's room requires a password to join */
+  hasPassword?: boolean;
 }
 
 // ─── Socket Event Payloads (Client → Server) ─────────────────────────────────
@@ -128,6 +132,22 @@ export interface KickedPayload {
   reason?: string;
 }
 
+/** Client → Server: disable a participant's camera. */
+export interface DisableCameraPayload {
+  roomId: string;
+  targetUserId: string;
+}
+
+/** Client → Server: report own camera on/off state to the server. */
+export interface CameraStateUpdatePayload {
+  isVideoOff: boolean;
+}
+
+/** Client → Server: report own mute state to the server. */
+export interface MuteStateUpdatePayload {
+  isMuted: boolean;
+}
+
 // ─── Meeting Engagement Tools (Issue #9) ────────────────────────────────────
 
 /** A raised-hand event broadcasted to the room. */
@@ -223,25 +243,6 @@ export interface RateLimitedPayload {
   message: string;
 }
 
-// ─── Device Session Events (Server → Client) ──────────────────────────────────
-
-/**
- * Emitted to a socket when the server detects that another socket from the
- * same physical device is already connected (production-only check).
- * The client should render the DuplicateSessionPage and optionally let the
- * user emit "take-over-session" to claim this tab.
- */
-export type DuplicateSessionEvent = 'duplicate-session';
-
-/**
- * Emitted to the *old* tab when a newer tab from the same device exercises
- * the "Use This Tab" / take-over action.  The old tab should render a
- * "session moved" screen and stop interacting with the server.
- */
-export type SessionTakenOverEvent = 'session-taken-over';
-
-/**
- * Emitted back to the *new* tab after the server grants the take-over.
- * The client clears the duplicate-session state and proceeds normally.
- */
-export type TakeOverGrantedEvent = 'take-over-granted';
+// ─── Device Session Events ────────────────────────────────────────────────────
+// Event name constants (duplicate-session, session-taken-over, take-over-session,
+// take-over-granted) are defined as runtime values in '@shared/events'.

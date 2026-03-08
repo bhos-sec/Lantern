@@ -5,14 +5,15 @@ import { broadcastPresence } from '../../services/presenceService';
 import { handleLeaveRoom } from '../../services/roomService';
 import { checkCooldown } from '../../lib/rateLimiter.js';
 import { JOIN_COOLDOWN_MS } from '../../config.js';
-import type { JoinRoomPayload, MuteUserPayload, UnmuteUserPayload, MuteAllPayload, KickUserPayload } from '@shared/types';
+import type { JoinRoomPayload, MuteUserPayload, UnmuteUserPayload, MuteAllPayload, KickUserPayload, DisableCameraPayload, CameraStateUpdatePayload, MuteStateUpdatePayload } from '@shared/types';
+import { SOCKET_EVENTS } from '@shared/events';
 
 /** Handles room lifecycle: create, join, leave, privacy toggling, and cleanup on disconnect. */
 export function registerRoomHandlers(socket: Socket, io: Server): void {
-  socket.on('join-room', (payload: JoinRoomPayload) => {
-    // ── Join throttling ───────────────────────────────────────────────────
+  socket.on(SOCKET_EVENTS.JOIN_ROOM, (payload: JoinRoomPayload) => {
+    // ── Join throttling ────────────────────────────────────────────────────────
     if (!checkCooldown(socket.id, 'join-room', JOIN_COOLDOWN_MS)) {
-      socket.emit('rate-limited', {
+      socket.emit(SOCKET_EVENTS.RATE_LIMITED, {
         action: 'join-room',
         retryAfterMs: JOIN_COOLDOWN_MS,
         message: `Please wait ${JOIN_COOLDOWN_MS / 1000}s before joining another room.`,
@@ -25,7 +26,7 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
 
     if (isCreating) {
       if (existingMeta) {
-        socket.emit('error', 'A room with this ID already exists. Please choose a different ID.');
+        socket.emit(SOCKET_EVENTS.ERROR, 'A room with this ID already exists. Please choose a different ID.');
         return;
       }
       roomRepository.create(roomId, {
@@ -35,43 +36,43 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
       });
     } else {
       if (!existingMeta) {
-        socket.emit('error', 'Room not found. Please check the ID or create a new room.');
+        socket.emit(SOCKET_EVENTS.ERROR, 'Room not found. Please check the ID or create a new room.');
         return;
       }
       if (existingMeta.isPrivate && existingMeta.adminId !== socket.id) {
-        socket.emit('error', 'This room is private and cannot be joined.');
+        socket.emit(SOCKET_EVENTS.ERROR, 'This room is private and cannot be joined.');
         return;
       }
       if (existingMeta.password && existingMeta.password !== password) {
-        socket.emit('error', 'Invalid room password.');
+        socket.emit(SOCKET_EVENTS.ERROR, 'Invalid room password.');
         return;
       }
     }
 
     socket.join(roomId);
-    socket.emit('join-room-success', roomId);
+    socket.emit(SOCKET_EVENTS.JOIN_ROOM_SUCCESS, roomId);
 
     // Update or create the user record with the new roomId
     if (userRepository.exists(socket.id)) {
       userRepository.update(socket.id, { roomId });
     } else {
       if (userRepository.isNameTaken(userName)) {
-        socket.emit('error', 'This name is already taken. Please choose another.');
+        socket.emit(SOCKET_EVENTS.ERROR, 'This name is already taken. Please choose another.');
         return;
       }
       userRepository.add(socket.id, { name: userName, roomId, showRoom: true });
     }
 
     broadcastPresence(io);
-    socket.to(roomId).emit('user-joined', { userId: socket.id, userName });
+    socket.to(roomId).emit(SOCKET_EVENTS.USER_JOINED, { userId: socket.id, userName });
     console.log(`User "${userName}" (${socket.id}) joined room "${roomId}"`);
   });
 
-  socket.on('leave-room', (roomId: string) => {
+  socket.on(SOCKET_EVENTS.LEAVE_ROOM, (roomId: string) => {
     handleLeaveRoom(socket, io, roomId);
   });
 
-  socket.on('toggle-room-privacy', (isPrivate: boolean) => {
+  socket.on(SOCKET_EVENTS.TOGGLE_ROOM_PRIVACY, (isPrivate: boolean) => {
     const user = userRepository.get(socket.id);
     if (!user?.roomId) return;
 
@@ -83,7 +84,7 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
   });
 
   // ── Host Controls (Issue #10) ──────────────────────────────────────────────────
-  socket.on('mute-user', ({ roomId, targetUserId }: MuteUserPayload) => {
+  socket.on(SOCKET_EVENTS.MUTE_USER, ({ roomId, targetUserId }: MuteUserPayload) => {
     const admin = userRepository.get(socket.id);
     if (!admin?.roomId || admin.roomId !== roomId) return;
 
@@ -94,11 +95,11 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
     if (!targetUser || targetUser.roomId !== roomId) return;
 
     userRepository.update(targetUserId, { isMuted: true });
-    io.to(targetUserId).emit('force-muted', { reason: 'Admin muted your microphone' });
+    io.to(targetUserId).emit(SOCKET_EVENTS.FORCE_MUTED, { reason: 'Admin muted your microphone' });
     broadcastPresence(io);
   });
 
-  socket.on('unmute-user', ({ roomId, targetUserId }: UnmuteUserPayload) => {
+  socket.on(SOCKET_EVENTS.UNMUTE_USER, ({ roomId, targetUserId }: UnmuteUserPayload) => {
     const admin = userRepository.get(socket.id);
     if (!admin?.roomId || admin.roomId !== roomId) return;
 
@@ -109,11 +110,11 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
     if (!targetUser || targetUser.roomId !== roomId) return;
 
     userRepository.update(targetUserId, { isMuted: false });
-    io.to(targetUserId).emit('force-unmuted', { reason: 'Admin unmuted your microphone' });
+    io.to(targetUserId).emit(SOCKET_EVENTS.FORCE_UNMUTED, { reason: 'Admin unmuted your microphone' });
     broadcastPresence(io);
   });
 
-  socket.on('mute-all', ({ roomId }: MuteAllPayload) => {
+  socket.on(SOCKET_EVENTS.MUTE_ALL, ({ roomId }: MuteAllPayload) => {
     const admin = userRepository.get(socket.id);
     if (!admin?.roomId || admin.roomId !== roomId) return;
 
@@ -124,13 +125,13 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
     userRepository.entries().forEach(([userId, user]) => {
       if (user.roomId === roomId && userId !== socket.id) {
         userRepository.update(userId, { isMuted: true });
-        io.to(userId).emit('force-muted', { reason: 'Admin muted all participants' });
+        io.to(userId).emit(SOCKET_EVENTS.FORCE_MUTED, { reason: 'Admin muted all participants' });
       }
     });
     broadcastPresence(io);
   });
 
-  socket.on('kick-user', ({ roomId, targetUserId }: KickUserPayload) => {
+  socket.on(SOCKET_EVENTS.KICK_USER, ({ roomId, targetUserId }: KickUserPayload) => {
     const admin = userRepository.get(socket.id);
     if (!admin?.roomId || admin.roomId !== roomId) return;
 
@@ -140,9 +141,38 @@ export function registerRoomHandlers(socket: Socket, io: Server): void {
     const targetSocket = io.sockets.sockets.get(targetUserId);
     if (!targetSocket) return;
 
-    io.to(targetUserId).emit('kicked', { reason: 'You were removed by the host' });
+    io.to(targetUserId).emit(SOCKET_EVENTS.KICKED, { reason: 'You were removed by the host' });
     handleLeaveRoom(targetSocket, io, roomId);
     targetSocket.disconnect(true);
+  });
+
+  socket.on(SOCKET_EVENTS.DISABLE_CAMERA, ({ roomId, targetUserId }: DisableCameraPayload) => {
+    const admin = userRepository.get(socket.id);
+    if (!admin?.roomId || admin.roomId !== roomId) return;
+
+    const meta = roomRepository.get(roomId);
+    if (meta?.adminId !== socket.id) return;
+
+    const targetUser = userRepository.get(targetUserId);
+    if (!targetUser || targetUser.roomId !== roomId) return;
+
+    userRepository.update(targetUserId, { isCameraOff: true });
+    io.to(targetUserId).emit(SOCKET_EVENTS.FORCE_CAMERA_OFF, { reason: 'Admin disabled your camera' });
+    broadcastPresence(io);
+  });
+
+  socket.on(SOCKET_EVENTS.CAMERA_STATE_UPDATE, ({ isVideoOff }: CameraStateUpdatePayload) => {
+    const user = userRepository.get(socket.id);
+    if (!user) return;
+    userRepository.update(socket.id, { isCameraOff: isVideoOff });
+    broadcastPresence(io);
+  });
+
+  socket.on(SOCKET_EVENTS.MUTE_STATE_UPDATE, ({ isMuted }: MuteStateUpdatePayload) => {
+    const user = userRepository.get(socket.id);
+    if (!user) return;
+    userRepository.update(socket.id, { isMuted });
+    broadcastPresence(io);
   });
 
   // Clean up when the socket disconnects without explicitly leaving

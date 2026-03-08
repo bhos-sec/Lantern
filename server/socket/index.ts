@@ -7,6 +7,7 @@ import { registerEngagementHandlers } from './handlers/engagementHandler';
 import { deviceSessionRepository } from '../repositories/deviceSessionRepository.js';
 import { clearLimiter } from '../lib/rateLimiter.js';
 import { IS_PROD } from '../config.js';
+import { SOCKET_EVENTS } from '@shared/events';
 
 /** Attach all domain-scoped event handlers to every new socket connection. */
 export function initSocketHandlers(io: Server): void {
@@ -27,7 +28,7 @@ export function initSocketHandlers(io: Server): void {
       if (existingSocketId) {
         // Another tab/window on the same device is already connected.
         socket.data.isDuplicate = true;
-        socket.emit('duplicate-session');
+        socket.emit(SOCKET_EVENTS.DUPLICATE_SESSION);
         console.log(`Duplicate session blocked – device: ${deviceId}, socket: ${socket.id}`);
       }
     }
@@ -43,13 +44,13 @@ export function initSocketHandlers(io: Server): void {
     // When the user clicks "Use This Tab" on the DuplicateSessionPage,
     // the client emits this event.  We kick the old socket and grant the
     // new one a clean session.
-    socket.on('take-over-session', () => {
+    socket.on(SOCKET_EVENTS.TAKE_OVER_SESSION, () => {
       if (!IS_PROD || !deviceId) return;
 
       const oldSocketId = deviceSessionRepository.getByDeviceId(deviceId);
       if (oldSocketId && oldSocketId !== socket.id) {
         // Notify the old tab so it can display a "taken over" screen
-        io.to(oldSocketId).emit('session-taken-over');
+        io.to(oldSocketId).emit(SOCKET_EVENTS.SESSION_TAKEN_OVER);
         // Give the old tab a moment to react before forcibly disconnecting it
         setTimeout(() => {
           io.sockets.sockets.get(oldSocketId)?.disconnect(true);
@@ -58,7 +59,7 @@ export function initSocketHandlers(io: Server): void {
 
       deviceSessionRepository.forceRegister(deviceId, socket.id);
       socket.data.isDuplicate = false;
-      socket.emit('take-over-granted');
+      socket.emit(SOCKET_EVENTS.TAKE_OVER_GRANTED);
       console.log(`Session taken over – device: ${deviceId}, new socket: ${socket.id}`);
     });
 

@@ -7,7 +7,7 @@ import {
   VideoOff,
   ChevronRight,
   ChevronLeft,
-  Blend,
+  Aperture,
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../hooks/useTheme';
@@ -44,12 +44,14 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the <video> element in sync with localStream
+  // Keep the <video> element in sync with localStream.
+  // Also depends on isVideoOff because toggling it unmounts/remounts the <video>
+  // element, so srcObject must be re-assigned when the element is recreated.
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = media.localStream;
     }
-  }, [media.localStream]);
+  }, [media.localStream, media.isVideoOff]);
 
   const handleJoin = async () => {
     sound('click');
@@ -100,49 +102,26 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
             )}
 
             {/* Overlay badges */}
-            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => { sound('click'); media.toggleMute(); }}
-                  className={cn(
-                    'p-2 rounded-xl border transition-all',
-                    media.isMuted
-                      ? 'bg-red-500/20 border-red-500/50 text-red-400'
-                      : 'bg-black/40 border-white/10 text-white backdrop-blur-sm',
-                  )}
-                  title={media.isMuted ? 'Unmute' : 'Mute'}
-                >
-                  {media.isMuted ? <MicOff size={16} /> : <Mic size={16} />}
-                </button>
-                <button
-                  onClick={() => { sound('click'); media.toggleVideo(); }}
-                  className={cn(
-                    'p-2 rounded-xl border transition-all',
-                    media.isVideoOff
-                      ? 'bg-red-500/20 border-red-500/50 text-red-400'
-                      : 'bg-black/40 border-white/10 text-white backdrop-blur-sm',
-                  )}
-                  title={media.isVideoOff ? 'Turn on camera' : 'Turn off camera'}
-                >
-                  {media.isVideoOff ? <VideoOff size={16} /> : <Video size={16} />}
-                </button>
-              </div>
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-end">
               {/* Blur toggle */}
               <button
                 onClick={() => {
                   sound('click');
-                  media.setBackgroundBlurEnabled(!media.backgroundBlurEnabled);
+                  if (!media.isVideoOff) media.setBackgroundBlurEnabled(!media.backgroundBlurEnabled);
                 }}
+                disabled={media.isVideoOff}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all',
-                  media.backgroundBlurEnabled
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                    : 'bg-black/40 border-white/10 text-white backdrop-blur-sm',
+                  media.isVideoOff
+                    ? 'opacity-40 cursor-not-allowed bg-black/40 border-white/10 text-white/50 backdrop-blur-sm'
+                    : media.backgroundBlurEnabled
+                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                      : 'bg-black/40 border-white/10 text-white backdrop-blur-sm',
                 )}
-                title="Toggle background blur"
+                title={media.isVideoOff ? 'Camera is off' : 'Toggle background blur'}
               >
-                <Blend size={14} />
-                Blur
+                <Aperture size={14} />
+                Blur BG
               </button>
             </div>
           </div>
@@ -200,7 +179,12 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
               </span>
               <div className="flex gap-2">
                 <button
-                  onClick={() => { sound('click'); media.setStartMuted(!media.startMuted); }}
+                  onClick={() => {
+                    sound('click');
+                    const newVal = !media.startMuted;
+                    media.setStartMuted(newVal);
+                    if (media.isMuted !== newVal) media.toggleMute();
+                  }}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-medium transition-all',
                     media.startMuted
@@ -212,7 +196,12 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
                   {media.startMuted ? 'Muted' : 'Mic On'}
                 </button>
                 <button
-                  onClick={() => { sound('click'); media.setStartVideoOff(!media.startVideoOff); }}
+                  onClick={() => {
+                    sound('click');
+                    const newVal = !media.startVideoOff;
+                    media.setStartVideoOff(newVal);
+                    if (media.isVideoOff !== newVal) media.toggleVideo();
+                  }}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-medium transition-all',
                     media.startVideoOff
@@ -230,16 +219,20 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
             <button
               onClick={() => {
                 sound('click');
-                media.setBackgroundBlurEnabled(!media.backgroundBlurEnabled);
+                if (!media.isVideoOff) media.setBackgroundBlurEnabled(!media.backgroundBlurEnabled);
               }}
+              disabled={media.isVideoOff}
               className={cn(
                 'flex items-center justify-center gap-2 py-2 rounded-xl border text-xs font-medium transition-all',
-                media.backgroundBlurEnabled
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
-                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400',
+                media.isVideoOff
+                  ? 'opacity-40 cursor-not-allowed bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-400 dark:text-zinc-600'
+                  : media.backgroundBlurEnabled
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+                    : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400',
               )}
+              title={media.isVideoOff ? 'Camera is off' : 'Toggle background blur'}
             >
-              <Blend size={14} />
+              <Aperture size={14} />
               {media.backgroundBlurEnabled ? 'Background Blur On' : 'Background Blur Off'}
             </button>
 

@@ -53,15 +53,13 @@ export function PollPanel({
             </span>
           )}
         </h3>
-        {isAdmin && (
-          <button
-            onClick={() => setCreating(v => !v)}
-            className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg border border-emerald-500/20 transition-all"
-          >
-            {creating ? <X size={12} /> : <Plus size={12} />}
-            {creating ? 'Cancel' : 'New Poll'}
-          </button>
-        )}
+        <button
+          onClick={() => setCreating(v => !v)}
+          className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg border border-emerald-500/20 transition-all"
+        >
+          {creating ? <X size={12} /> : <Plus size={12} />}
+          {creating ? 'Cancel' : 'New Poll'}
+        </button>
       </div>
 
       {/* Create poll form */}
@@ -205,7 +203,7 @@ export function PollPanel({
                       <span className="text-[10px] text-zinc-400">
                         {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
                       </span>
-                      {isAdmin && !poll.closed && (
+                      {(isAdmin || poll.createdBy === currentUserId) && !poll.closed && (
                         <button
                           onClick={() => onClosePoll(poll.id)}
                           className="text-[10px] text-zinc-400 hover:text-red-500 transition-colors"
