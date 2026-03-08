@@ -45,6 +45,15 @@ export default function App() {
     roomId,
   });
 
+  // Clean up resources when session is taken over by another tab
+  useEffect(() => {
+    if (!isSessionTakenOver) return;
+    media.stopAllTracks();
+    closeAllPeers();
+    clearMessages();
+    socket.disconnect();
+  }, [isSessionTakenOver, media, closeAllPeers, clearMessages]);
+
   // Listen for incoming chat messages and play a sound for others' messages
   useEffect(() => {
     const handleMessage = (msg: any) => {

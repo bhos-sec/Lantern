@@ -30,7 +30,17 @@ export function initSocketHandlers(io: Server): void {
       }
     }
 
-    // Register all domain handlers (they individually guard against duplicates)
+    // ── Central middleware: block all events for duplicate sessions ────────
+    // Except take-over-session (which allows the blocked tab to claim the session)
+    socket.use(([eventName, ...args], next) => {
+      if (socket.data.isDuplicate && eventName !== 'take-over-session') {
+        console.log(`Blocked event "${eventName}" from duplicate session ${socket.id}`);
+        return; // Silently drop the event
+      }
+      next();
+    });
+
+    // Register all domain handlers (central middleware now blocks duplicates)
     registerUserHandlers(socket, io);
     registerRoomHandlers(socket, io);
     registerChatHandlers(socket, io);
