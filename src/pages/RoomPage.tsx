@@ -14,12 +14,9 @@ import {
   Settings,
   Volume2,
   VolumeX,
-  Sun,
-  Moon,
 } from 'lucide-react';
 import { socket } from '../lib/socket';
 import { useAppContext } from '../context/AppContext';
-import { useTheme } from '../hooks/useTheme';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { Sidebar } from '../components/Sidebar';
 import { MediaSettingsModal } from '../components/ui/MediaSettingsModal';
@@ -52,7 +49,6 @@ export function RoomPage({
   onTogglePrivacy,
 }: RoomPageProps) {
   const { onlineUsers, soundEnabled, setSoundEnabled, sound, userId, userName } = useAppContext();
-  const { isDark, toggleTheme } = useTheme();
 
   const [showChat, setShowChat] = useState(false);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'chat' | 'room' | 'all'>('chat');
@@ -133,7 +129,7 @@ export function RoomPage({
                 'p-2 rounded-lg transition-all border',
                 soundEnabled
                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
-                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-500',
+                  : 'bg-zinc-800 border-white/5 text-zinc-500',
               )}
               title={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
             >
@@ -145,7 +141,7 @@ export function RoomPage({
                 sound('click');
                 setShowSettings(true);
               }}
-              className="p-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg border border-zinc-200 dark:border-white/5 transition-all"
+              className="p-2 bg-zinc-900 text-zinc-400 hover:text-white rounded-lg border border-white/5 transition-all"
               title="Media Settings"
             >
               <Settings size={16} />
@@ -178,10 +174,10 @@ export function RoomPage({
                 setShowChat(v => !v);
               }}
               className={cn(
-                'p-2 rounded-full transition-all border border-zinc-200 dark:border-white/5 xl:hidden',
+                'p-2 rounded-full transition-all border border-white/5 xl:hidden',
                 showChat
                   ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/50'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400',
+                  : 'bg-zinc-800 text-zinc-400',
               )}
             >
               <Users size={18} />
@@ -192,7 +188,7 @@ export function RoomPage({
                 sound('click');
                 onLeaveRoom();
               }}
-              className="flex items-center gap-2 px-3 md:px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-red-500/10 hover:text-red-500 text-zinc-500 dark:text-zinc-400 rounded-full text-xs md:text-sm font-medium transition-all border border-zinc-200 dark:border-white/5"
+              className="flex items-center gap-2 px-3 md:px-4 py-2 bg-zinc-800 hover:bg-red-500/10 hover:text-red-500 text-zinc-400 rounded-full text-xs md:text-sm font-medium transition-all border border-white/5"
             >
               <LogOut size={16} />
               <span className="hidden sm:inline">Leave</span>
@@ -269,7 +265,7 @@ export function RoomPage({
                 'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
                 media.isMuted
                   ? 'bg-red-500/10 border-red-500/50 text-red-500'
-                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+                  : 'bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700',
               )}
             >
               {media.isMuted ? <MicOff size={20} /> : <Mic size={20} />}
@@ -284,7 +280,7 @@ export function RoomPage({
                 'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
                 media.isVideoOff
                   ? 'bg-red-500/10 border-red-500/50 text-red-500'
-                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+                  : 'bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700',
               )}
             >
               {media.isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
@@ -301,7 +297,7 @@ export function RoomPage({
                 'flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all border font-semibold',
                 media.isScreenSharing
                   ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
-                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+                  : 'bg-zinc-800 border-white/5 text-zinc-200 hover:bg-zinc-700',
               )}
             >
               <Monitor size={20} />

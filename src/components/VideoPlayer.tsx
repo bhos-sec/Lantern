@@ -136,7 +136,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <div
-      className={`relative group bg-zinc-200 dark:bg-zinc-900 rounded-2xl overflow-hidden border shadow-2xl transition-all duration-300 ${
+      className={`relative group bg-zinc-900 rounded-2xl overflow-hidden border shadow-2xl transition-all duration-300 ${
         isFullscreen ? 'fixed inset-4 z-50' : 'aspect-video'
       } ${isSpeaking ? 'border-emerald-500 shadow-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'border-zinc-300 dark:border-white/5'}`}
       onWheel={handleWheel}
