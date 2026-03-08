@@ -54,6 +54,7 @@ export function RoomPage({
   const [activeSidebarTab, setActiveSidebarTab] = useState<'chat' | 'room' | 'all'>('chat');
   const [showSettings, setShowSettings] = useState(false);
   const [fullscreenUserId, setFullscreenUserId] = useState<string | null>(null);
+  const [engagementPanel, setEngagementPanel] = useState<'polls' | 'qa' | null>(null);
 
   const currentUser = onlineUsers.find(u => u.id === userId);
   const isAdmin = currentUser?.isAdmin ?? false;
@@ -198,6 +199,9 @@ export function RoomPage({
 
         {/* Video Grid */}
         <main className="flex-1 p-4 md:p-6 overflow-y-auto relative">
+          {/* Floating emoji reactions overlay */}
+          <ReactionsOverlay reactions={engagement.reactions} />
+
           {/* Fullscreen backdrop */}
           {fullscreenUserId && (
             <div
@@ -221,9 +225,43 @@ export function RoomPage({
                 userName={data.name}
                 isFullscreen={fullscreenUserId === id}
                 onToggleFullscreen={() => toggleFullscreen(id)}
+                handRaised={engagement.raisedHands[id]}
               />
             ))}
           </div>
+
+          {/* Engagement panel (polls / Q&A) — floating panel */}
+          <AnimatePresence>
+            {engagementPanel && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="absolute top-4 right-4 w-80 h-[calc(100%-2rem)] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 rounded-2xl shadow-2xl overflow-hidden z-20"
+              >
+                {engagementPanel === 'polls' ? (
+                  <PollPanel
+                    polls={engagement.polls}
+                    currentUserId={userId}
+                    isAdmin={isAdmin}
+                    onCreatePoll={engagement.createPoll}
+                    onVote={engagement.votePoll}
+                    onClosePoll={engagement.closePoll}
+                  />
+                ) : (
+                  <QAPanel
+                    questions={engagement.questions}
+                    currentUserId={userId}
+                    currentUserName={userName}
+                    isAdmin={isAdmin}
+                    onSubmitQuestion={text => engagement.submitQuestion(text, userName)}
+                    onUpvote={engagement.upvoteQuestion}
+                    onAnswered={engagement.answerQuestion}
+                  />
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
 
         {/* Mobile Sidebar Overlay */}
@@ -304,6 +342,52 @@ export function RoomPage({
               <span className="text-xs md:text-sm">
                 {media.isScreenSharing ? 'Sharing' : 'Share'}
               </span>
+            </button>
+
+            <div className="w-px h-6 md:h-8 bg-zinc-200 dark:bg-white/10 mx-1 md:mx-2" />
+
+            {/* Engagement toolbar: raise hand + reactions */}
+            <EngagementToolbar
+              isHandRaised={engagement.isHandRaised}
+              onRaiseHand={engagement.raiseHand}
+              onLowerHand={engagement.lowerHand}
+              onSendReaction={engagement.sendReaction}
+            />
+
+            <div className="w-px h-6 md:h-8 bg-zinc-200 dark:bg-white/10 mx-1 md:mx-2" />
+
+            {/* Polls toggle */}
+            <button
+              onClick={() => {
+                sound('click');
+                setEngagementPanel(p => (p === 'polls' ? null : 'polls'));
+              }}
+              className={cn(
+                'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
+                engagementPanel === 'polls'
+                  ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
+                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+              )}
+              title="Polls"
+            >
+              <BarChart2 size={20} />
+            </button>
+
+            {/* Q&A toggle */}
+            <button
+              onClick={() => {
+                sound('click');
+                setEngagementPanel(p => (p === 'qa' ? null : 'qa'));
+              }}
+              className={cn(
+                'p-3 md:p-4 rounded-xl md:rounded-2xl transition-all border',
+                engagementPanel === 'qa'
+                  ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
+                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700',
+              )}
+              title="Q&A"
+            >
+              <MessageCircleQuestion size={20} />
             </button>
           </div>
         </footer>

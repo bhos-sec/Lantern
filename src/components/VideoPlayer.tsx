@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Maximize, Minimize, ZoomIn, ZoomOut } from 'lucide-react';
+import { Maximize, Minimize, ZoomIn, ZoomOut, Hand } from 'lucide-react';
 
 interface VideoPlayerProps {
   stream: MediaStream | null;
@@ -8,6 +8,8 @@ interface VideoPlayerProps {
   isMuted?: boolean;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  /** Whether this participant has their hand raised (shown as a badge). */
+  handRaised?: boolean;
 }
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
