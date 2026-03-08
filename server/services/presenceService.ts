@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { userRepository } from '../repositories/userRepository';
 import { roomRepository } from '../repositories/roomRepository';
+import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import type { PresenceUser } from '@shared/types';
 
 /**
@@ -23,5 +24,5 @@ export function broadcastPresence(io: Server): void {
     };
   });
 
-  io.emit('presence-update', userList);
+  io.emit(SOCKET_MESSAGE.PRESENCE_UPDATE, userList);
 }

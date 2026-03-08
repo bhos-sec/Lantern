@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Settings, X, Video, VideoOff, Mic, MicOff, Blend } from 'lucide-react';
+import { Settings, X, Video, VideoOff, Mic, MicOff } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface Props {
@@ -71,7 +71,7 @@ export function MediaSettingsModal({
                   <select
                     value={selectedVideoDevice}
                     onChange={e => onVideoDeviceChange(e.target.value)}
-                    className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     <option value="">Default Camera</option>
                     {videoDevices.map(d => (
@@ -89,7 +89,7 @@ export function MediaSettingsModal({
                   <select
                     value={selectedAudioDevice}
                     onChange={e => onAudioDeviceChange(e.target.value)}
-                    className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   >
                     <option value="">Default Microphone</option>
                     {audioDevices.map(d => (
@@ -113,7 +113,7 @@ export function MediaSettingsModal({
                       'flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium',
                       startVideoOff
                         ? 'bg-red-500/10 border-red-500/50 text-red-500'
-                        : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300',
+                        : 'bg-zinc-800 border-white/5 text-zinc-300',
                     )}
                   >
                     {startVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
@@ -125,7 +125,7 @@ export function MediaSettingsModal({
                       'flex items-center justify-center gap-2 p-4 rounded-2xl border transition-all text-sm font-medium',
                       startMuted
                         ? 'bg-red-500/10 border-red-500/50 text-red-500'
-                        : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300',
+                        : 'bg-zinc-800 border-white/5 text-zinc-300',
                     )}
                   >
                     {startMuted ? <MicOff size={18} /> : <Mic size={18} />}

@@ -25,9 +25,10 @@ function getDeviceId(): string {
 // Created once at module load so HMR doesn't open extra connections.
 // The deviceId is sent in the handshake auth so the server can enforce
 // the single-session-per-device rule in production (npm run user).
+const deviceId: string = getDeviceId();
 export const socket: Socket = io({
-  auth: { deviceId: getDeviceId() },
+  auth: { deviceId },
 });
 
 /** Expose the device id so other modules can reference it if needed. */
-export const deviceId: string = getDeviceId();
+export { deviceId };

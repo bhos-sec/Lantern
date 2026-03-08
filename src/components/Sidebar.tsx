@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-bold transition-all',
             activeTab === 'chat'
               ? 'bg-emerald-500/10 text-emerald-500'
-              : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300',
+              : 'text-zinc-500 hover:text-zinc-300',
           )}
         >
           <MessageSquare size={14} />
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-bold transition-all',
             activeTab === 'room'
               ? 'bg-emerald-500/10 text-emerald-500'
-              : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300',
+              : 'text-zinc-500 hover:text-zinc-300',
           )}
         >
           <Users size={14} />
@@ -100,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-bold transition-all',
             activeTab === 'all'
               ? 'bg-emerald-500/10 text-emerald-500'
-              : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300',
+              : 'text-zinc-500 hover:text-zinc-300',
           )}
         >
           <Users size={14} />
@@ -150,8 +150,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               exit={{ opacity: 0, x: -10 }}
               className="h-full flex flex-col p-4 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent"
             >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+              <div className="space-y-1 mb-2">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">
                   In this Room
                 </h3>
                 {isAdmin && onMuteAll && (
@@ -181,7 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-zinc-900 rounded-full" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                      <span className="text-sm font-medium text-zinc-200">
                         {user.name} {user.id === currentUserId && '(You)'}
                       </span>
                     </div>
@@ -248,7 +248,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="h-full flex flex-col p-4 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent"
             >
               <div className="space-y-1 mb-2">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">
                   All Online
                 </h3>
               </div>
@@ -265,10 +265,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-zinc-900 rounded-full" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                      <span className="text-sm font-medium text-zinc-200">
                         {user.name} {user.id === currentUserId && '(You)'}
                       </span>
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                      <span className="text-[10px] text-zinc-500">
                         {user.roomId
                           ? `In: ${user.roomId}`
                           : user.actualRoomId
