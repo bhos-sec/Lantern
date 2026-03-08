@@ -7,6 +7,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { socket } from '../lib/socket';
+import { SOCKET_MESSAGE } from '@shared/socketEvents';
 import { useNotifications } from '../hooks/useNotifications';
 import { playSound } from '../lib/sounds';
 import type { PresenceUser, RateLimitedPayload } from '@shared/types';
@@ -75,16 +76,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Global socket listeners that affect top-level app state
   useEffect(() => {
-    socket.on('presence-update', setOnlineUsers);
+    socket.on(SOCKET_MESSAGE.PRESENCE_UPDATE, setOnlineUsers);
 
-    socket.on('name-set-success', () => {
+    socket.on(SOCKET_MESSAGE.SET_NAME_SUCCESS, () => {
       setStep('lobby');
       setError(null);
       sound('join');
       addNotification('Welcome to Lantern!', 'success');
     });
 
-    socket.on('error', (msg: string) => {
+    socket.on(SOCKET_MESSAGE.ERROR, (msg: string) => {
       setError(msg);
       addNotification(msg, 'error');
     });
@@ -97,34 +98,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     // ── Device-session events ─────────────────────────────────────────────
     // Server tells this tab it's a duplicate (another tab is already active).
-    socket.on('duplicate-session', () => {
+    socket.on(SOCKET_MESSAGE.DUPLICATE_SESSION, () => {
       setIsDuplicateSession(true);
     });
 
     // Server tells this tab its session was claimed by a newer tab.
-    socket.on('session-taken-over', () => {
+    socket.on(SOCKET_MESSAGE.SESSION_TAKEN_OVER, () => {
       setIsSessionTakenOver(true);
     });
 
     // Server grants the take-over — clear the blocked state and resume.
-    socket.on('take-over-granted', () => {
+    socket.on(SOCKET_MESSAGE.TAKE_OVER_GRANTED, () => {
       setIsDuplicateSession(false);
     });
 
     return () => {
-      socket.off('presence-update', setOnlineUsers);
-      socket.off('name-set-success');
-      socket.off('error');
-      socket.off('rate-limited');
-      socket.off('duplicate-session');
-      socket.off('session-taken-over');
-      socket.off('take-over-granted');
+      socket.off(SOCKET_MESSAGE.PRESENCE_UPDATE, setOnlineUsers);
+      socket.off(SOCKET_MESSAGE.SET_NAME_SUCCESS);
+      socket.off(SOCKET_MESSAGE.ERROR);
+      socket.off(SOCKET_MESSAGE.DUPLICATE_SESSION);
+      socket.off(SOCKET_MESSAGE.SESSION_TAKEN_OVER);
+      socket.off(SOCKET_MESSAGE.TAKE_OVER_GRANTED);
     };
   }, [sound, addNotification]);
 
   /** Ask the server to evict the existing session and grant this tab. */
   const takeOverSession = useCallback(() => {
-    socket.emit('take-over-session');
+    socket.emit(SOCKET_MESSAGE.TAKE_OVER_SESSION);
   }, []);
 
   const value: AppContextValue = {

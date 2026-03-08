@@ -117,7 +117,7 @@ export const Chat: React.FC<ChatProps> = ({
             placeholder={
               privateRecipient ? `Message ${privateRecipient.name}...` : 'Type a message...'
             }
-            className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/5 rounded-full py-3 pl-5 pr-12 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+            className="w-full bg-zinc-800 border border-white/5 rounded-full py-3 pl-5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
           />
           {inputText.length > MAX_MSG_LENGTH * 0.85 && (
             <span className="absolute right-14 top-1/2 -translate-y-1/2 text-[10px] text-zinc-400 dark:text-zinc-500">

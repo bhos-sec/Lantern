@@ -24,7 +24,7 @@ export function NotificationToast({ notifications }: Props) {
                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
                 : n.type === 'error'
                   ? 'bg-red-500/10 border-red-500/20 text-red-500'
-                  : 'bg-white dark:bg-zinc-900/90 border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-200',
+                  : 'bg-zinc-900/90 border-white/10 text-zinc-200',
             )}
           >
             <div
@@ -34,7 +34,7 @@ export function NotificationToast({ notifications }: Props) {
                   ? 'bg-emerald-500'
                   : n.type === 'error'
                     ? 'bg-red-500'
-                    : 'bg-zinc-400 dark:bg-zinc-500',
+                    : 'bg-zinc-400',
               )}
             />
             <p className="text-sm font-medium">{n.message}</p>
