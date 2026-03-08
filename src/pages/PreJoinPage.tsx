@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Mic, MicOff, Video, VideoOff, ChevronRight, ChevronLeft, Blend } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { useTheme } from '../hooks/useTheme';
 import { cn } from '../lib/utils';
 import type { UseMediaReturn } from '../hooks/useMedia';
 
@@ -20,8 +19,7 @@ interface PreJoinPageProps {
  * blur, and configure mute/video-off before entering the meeting.
  */
 export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) {
-  const { pendingRoomId, sound } = useAppContext();
-  const { isDark } = useTheme();
+  const { sound } = useAppContext();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Acquire a preview stream as soon as the page mounts
@@ -49,12 +47,7 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
   };
 
   return (
-    <div
-      className={cn(
-        'min-h-dvh flex items-center justify-center p-4 md:p-8',
-        isDark ? 'bg-zinc-950' : 'bg-zinc-50',
-      )}
-    >
+    <div className={cn('min-h-dvh flex items-center justify-center p-4 md:p-8', 'bg-zinc-950')}>
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -66,10 +59,7 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
           <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">
             Ready to join?
           </h1>
-          <p className="text-zinc-500 text-sm">
-            Room <span className="font-semibold text-emerald-500">#{pendingRoomId}</span> —
-            configure your devices before entering.
-          </p>
+          <p className="text-zinc-500 text-sm">Configure your devices before entering.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -124,23 +114,6 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
                   {media.isVideoOff ? <VideoOff size={16} /> : <Video size={16} />}
                 </button>
               </div>
-              {/* Blur toggle */}
-              <button
-                onClick={() => {
-                  sound('click');
-                  media.setBackgroundBlurEnabled(!media.backgroundBlurEnabled);
-                }}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all',
-                  media.backgroundBlurEnabled
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                    : 'bg-black/40 border-white/10 text-white backdrop-blur-sm',
-                )}
-                title="Toggle background blur"
-              >
-                <Blend size={14} />
-                Blur
-              </button>
             </div>
           </div>
 
@@ -228,23 +201,6 @@ export function PreJoinPage({ media, onConfirmJoin, onBack }: PreJoinPageProps) 
                 </button>
               </div>
             </div>
-
-            {/* Background Blur toggle (full-width) */}
-            <button
-              onClick={() => {
-                sound('click');
-                media.setBackgroundBlurEnabled(!media.backgroundBlurEnabled);
-              }}
-              className={cn(
-                'flex items-center justify-center gap-2 py-2 rounded-xl border text-xs font-medium transition-all',
-                media.backgroundBlurEnabled
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
-                  : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400',
-              )}
-            >
-              <Blend size={14} />
-              {media.backgroundBlurEnabled ? 'Background Blur On' : 'Background Blur Off'}
-            </button>
 
             <div className="flex-1" />
 

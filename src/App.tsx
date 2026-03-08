@@ -10,7 +10,6 @@ import { useRoom } from './hooks/useRoom';
 import { NotificationToast } from './components/ui/NotificationToast';
 import { NameEntryPage } from './pages/NameEntryPage';
 import { LobbyPage } from './pages/LobbyPage';
-import { PreJoinPage } from './pages/PreJoinPage';
 import { RoomPage } from './pages/RoomPage';
 import { DuplicateSessionPage } from './pages/DuplicateSessionPage';
 
@@ -78,8 +77,6 @@ export default function App() {
         const audio = media.localStream.getAudioTracks()[0];
         const video = media.localStream.getVideoTracks()[0];
         // The useMedia hook keeps isMuted / isVideoOff in sync via acquireMedia
-        _ = audio;
-        _ = video; // already set inside acquireMedia
       }
     };
     socket.on(SOCKET_MESSAGE.JOIN_ROOM_SUCCESS, handleJoinSuccess);
@@ -116,35 +113,6 @@ export default function App() {
     },
     [userName, media],
   );
-
-  /**
-   * Called by LobbyPage. Instead of joining immediately, stash the room
-   * details and navigate to the pre-join screen for device preview.
-   */
-  const goToPreJoin = useCallback(
-    async (idToJoin: string, password?: string, isPrivate?: boolean, isCreating?: boolean) => {
-      if (!idToJoin || !userName) return;
-      setPendingRoomId(idToJoin);
-      setPendingRoomPassword(password);
-      setPendingIsPrivate(isPrivate ?? false);
-      setPendingIsCreating(isCreating ?? false);
-      setStep('pre-join');
-    },
-    [
-      userName,
-      setPendingRoomId,
-      setPendingRoomPassword,
-      setPendingIsPrivate,
-      setPendingIsCreating,
-      setStep,
-    ],
-  );
-
-  /** Called from PreJoinPage "Join Now" — actually performs the join. */
-  const confirmPreJoin = useCallback(async () => {
-    if (!pendingRoomId) return;
-    await joinRoom(pendingRoomId, pendingRoomPassword, pendingIsPrivate, pendingIsCreating);
-  }, [pendingRoomId, pendingRoomPassword, pendingIsPrivate, pendingIsCreating, joinRoom]);
 
   /** Stop tracks, close peers, clear messages, go back to lobby. */
   const leaveRoom = useCallback(() => {
@@ -204,18 +172,7 @@ export default function App() {
 
       {step === 'name' && <NameEntryPage media={media} />}
 
-      {step === 'lobby' && <LobbyPage media={media} onJoinRoom={goToPreJoin} />}
-
-      {step === 'pre-join' && (
-        <PreJoinPage
-          media={media}
-          onConfirmJoin={confirmPreJoin}
-          onBack={() => {
-            media.stopAllTracks();
-            setStep('lobby');
-          }}
-        />
-      )}
+      {step === 'lobby' && <LobbyPage media={media} onJoinRoom={joinRoom} />}
 
       {step === 'room' && (
         <RoomPage
@@ -228,20 +185,6 @@ export default function App() {
           onTogglePrivacy={toggleRoomPrivacy}
         />
       )}
-
-      {step !== 'name' && step !== 'lobby' && step !== 'pre-join' && step !== 'room' && (
-        <div className="min-h-dvh flex items-center justify-center bg-zinc-950">
-          <button
-            onClick={() => setStep('name')}
-            className="text-zinc-400 hover:text-white transition-colors"
-          >
-            Return to start
-          </button>
-        </div>
-      )}
     </>
   );
 }
-
-// Silence TS "variable declared but never read" for the sync block above
-declare let _: any;
